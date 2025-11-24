@@ -3,6 +3,7 @@
  * QMC Hospital Management System
  */
 
+/* full screen gradient background for login page */
 body {
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     min-height: 100vh;
@@ -12,6 +13,7 @@ body {
     padding: 20px;
 }
 
+/* login box container - white card in center */
 .login-container {
     background: white;
     border-radius: 10px;
@@ -21,6 +23,7 @@ body {
     width: 100%;
 }
 
+/* header section with gradient background */
 .login-header {
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     color: white;
@@ -38,10 +41,12 @@ body {
     opacity: 0.9;
 }
 
+/* main login form area */
 .login-body {
     padding: 30px;
 }
 
+/* footer section at bottom of login box */
 .login-footer {
     padding: 20px 30px;
     background: #f8f9fa;
@@ -50,6 +55,7 @@ body {
     color: #666;
 }
 
+/* error message box - red background */
 .error-message {
     background: #fee;
     color: #c33;
@@ -60,6 +66,7 @@ body {
     font-size: 14px;
 }
 
+/* login button with gradient and hover efect */
 .btn-login {
     width: 100%;
     padding: 12px;
@@ -73,6 +80,7 @@ body {
     transition: transform 0.2s, box-shadow 0.2s;
 }
 
+/* button lifts up on hover */
 .btn-login:hover {
     transform: translateY(-2px);
     box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);

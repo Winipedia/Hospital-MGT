@@ -1,13 +1,13 @@
 <?php
 session_start();
 
-// Check if user is logged in
+// check if user logged in
 if (!isset($_SESSION['staffno'])) {
     header('Location: ../index.php');
     exit();
 }
 
-// Check if user is admin
+// make sure user is admin, only admins can create doctors
 if (!isset($_SESSION['is_admin']) || $_SESSION['is_admin'] != 1) {
     header('Location: ../dashboard.php');
     exit();
@@ -15,16 +15,18 @@ if (!isset($_SESSION['is_admin']) || $_SESSION['is_admin'] != 1) {
 
 require_once '../db.inc.php';
 
+// setup variables
 $staffno = $_SESSION['staffno'];
 $success = '';
 $error = '';
 
-// Handle create doctor form submission
+// handle form submission for creating new doctor
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['create_doctor'])) {
+    // grab all the form fields
     $new_staffno = strtoupper(trim($_POST['staffno'] ?? ''));
     $username = trim($_POST['username'] ?? '');
     $password = trim($_POST['password'] ?? '');
-    $firstname = trim($_POST['firstname'] ?? '');
+    $firstname = trim($_POST['firstname'] ?? ''));
     $lastname = trim($_POST['lastname'] ?? '');
     $specialisation_id = intval($_POST['specialisation_id'] ?? 0);
     $qualification = trim($_POST['qualification'] ?? '');
@@ -33,40 +35,41 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['create_doctor'])) {
     $consultantstatus = isset($_POST['consultantstatus']) ? 1 : 0;
     $ward_id = !empty($_POST['ward_id']) ? intval($_POST['ward_id']) : null;
     $is_admin = isset($_POST['is_admin']) ? 1 : 0;
-    
-    // Address fields (optional)
+
+    // address fields are optional
     $street = trim($_POST['street'] ?? '');
     $city = trim($_POST['city'] ?? '');
     $postcode = trim($_POST['postcode'] ?? '');
-    
-    // Validation
+
+    // basic validation - need staff number, name, and pay
     if (empty($new_staffno) || empty($firstname) || $pay <= 0) {
         $error = 'Staff Number, First Name, and Pay are required';
     } else {
-        // Check if staff number already exists
+        // check if staff number already in use
         $check_staff_sql = "SELECT staffno FROM doctor WHERE staffno = ?";
         $check_staff_stmt = $conn->prepare($check_staff_sql);
         $check_staff_stmt->bind_param("s", $new_staffno);
         $check_staff_stmt->execute();
         $check_staff_result = $check_staff_stmt->get_result();
-        
+
         if ($check_staff_result->num_rows > 0) {
             $error = "Staff number '$new_staffno' already exists";
         } else {
-            // Check if username already exists (if provided)
+            // also check if username is taken if they provided one
             if (!empty($username)) {
                 $check_user_sql = "SELECT username FROM doctor WHERE username = ?";
                 $check_user_stmt = $conn->prepare($check_user_sql);
                 $check_user_stmt->bind_param("s", $username);
                 $check_user_stmt->execute();
                 $check_user_result = $check_user_stmt->get_result();
-                
+
                 if ($check_user_result->num_rows > 0) {
                     $error = "Username '$username' already exists";
                 }
                 $check_user_stmt->close();
             }
-            
+
+            // if no errors so far, proceed with creating doctor
             if (empty($error)) {
                 // Create address if provided
                 $address_id = null;
@@ -163,12 +166,12 @@ while ($row = $doctors_result->fetch_assoc()) {
     $doctors[] = $row;
 }
 
-// Set page variables for header
+// setup page title
 $page_title = 'Create Doctor Account - QMC Hospital Management System';
 $extra_css = [];
-$css_path_prefix = '../'; // For admin subdirectory
+$css_path_prefix = '../'; // for admin subdirectory
 
-// Include header
+// load templates
 require_once '../includes/header.php';
 require_once '../includes/navbar.php';
 ?>

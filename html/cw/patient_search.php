@@ -1,7 +1,7 @@
 <?php
 session_start();
 
-// Check if user is logged in
+// check if user logged in
 if (!isset($_SESSION['staffno'])) {
     header('Location: index.php');
     exit();
@@ -9,6 +9,7 @@ if (!isset($_SESSION['staffno'])) {
 
 require_once 'db.inc.php';
 
+// setup variables for patient list and pagination
 $patients = [];
 $total_patients = 0;
 $search_term = '';
@@ -16,14 +17,14 @@ $page = isset($_GET['page']) ? max(1, intval($_GET['page'])) : 1;
 $per_page = 5;
 $offset = ($page - 1) * $per_page;
 
-// Get search term
+// get search term from url if it exists
 if (isset($_GET['search_term'])) {
     $search_term = trim($_GET['search_term']);
 }
 
-// Build query based on search
+// build query based on whether we're searching or not
 if (!empty($search_term)) {
-    // Search query
+    // count how many patients match the search
     $count_sql = "SELECT COUNT(*) as total FROM patient p
                   WHERE p.NHSno LIKE ?
                      OR CONCAT(p.firstname, ' ', p.lastname) LIKE ?
@@ -38,7 +39,7 @@ if (!empty($search_term)) {
     $total_patients = $count_result->fetch_assoc()['total'];
     $count_stmt->close();
 
-    // Get patients
+    // get the actual patient records that match
     $patients_sql = "SELECT p.*, g.gender_name
                      FROM patient p
                      LEFT JOIN gender g ON p.gender_id = g.gender_id
@@ -56,7 +57,7 @@ if (!empty($search_term)) {
     $patients = $patients_result->fetch_all(MYSQLI_ASSOC);
     $patients_stmt->close();
 
-    // Log search
+    // log the search in audit trail
     $audit_sql = "INSERT INTO audit_log (user_id, action, table_name, new_value, ip_address)
                   VALUES (?, 'SELECT', 'patient', ?, ?)";
     $audit_stmt = $conn->prepare($audit_sql);
@@ -66,11 +67,12 @@ if (!empty($search_term)) {
     $audit_stmt->execute();
     $audit_stmt->close();
 } else {
-    // Get all patients (initial load)
+    // no search term, just show all patients with pagination
     $count_sql = "SELECT COUNT(*) as total FROM patient";
     $count_result = $conn->query($count_sql);
     $total_patients = $count_result->fetch_assoc()['total'];
 
+    // get patients for current page
     $patients_sql = "SELECT p.*, g.gender_name
                      FROM patient p
                      LEFT JOIN gender g ON p.gender_id = g.gender_id
@@ -85,16 +87,17 @@ if (!empty($search_term)) {
     $patients_stmt->close();
 }
 
+// calculate total pages for pagination
 $total_pages = ceil($total_patients / $per_page);
 
-// Set page variables for header
+// setup page title
 $page_title = 'Patient Search - QMC Hospital Management System';
 $extra_css = [];
 
-// Include header
+// load header template
 require_once 'includes/header.php';
 
-// Include navbar
+// load navbar
 require_once 'includes/navbar.php';
 ?>
 

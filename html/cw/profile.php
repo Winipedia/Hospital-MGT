@@ -1,7 +1,7 @@
 <?php
 session_start();
 
-// Check if user is logged in
+// check if user logged in
 if (!isset($_SESSION['staffno'])) {
     header('Location: index.php');
     exit();
@@ -9,10 +9,11 @@ if (!isset($_SESSION['staffno'])) {
 
 require_once 'db.inc.php';
 
+// setup message variables
 $success = '';
 $error = '';
 
-// Get current user information
+// get current users full profile info from database
 $staffno = $_SESSION['staffno'];
 $sql = "SELECT d.*, s.specialisation_name, w.wardname as ward_name
         FROM doctor d
@@ -26,13 +27,13 @@ $result = $stmt->get_result();
 $doctor = $result->fetch_assoc();
 $stmt->close();
 
-// Handle password change
+// handle password change form submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['change_password'])) {
     $current_password = $_POST['current_password'] ?? '';
     $new_password = $_POST['new_password'] ?? '';
     $confirm_password = $_POST['confirm_password'] ?? '';
 
-    // Validation
+    // validate password change request
     if (empty($current_password) || empty($new_password) || empty($confirm_password)) {
         $error = 'All password fields are required';
     } elseif ($current_password !== $doctor['password']) {
@@ -42,13 +43,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['change_password'])) {
     } elseif (strlen($new_password) < 6) {
         $error = 'New password must be at least 6 characters long';
     } else {
-        // Update password
+        // all validation passed, update the password
         $update_sql = "UPDATE doctor SET password = ? WHERE staffno = ?";
         $update_stmt = $conn->prepare($update_sql);
         $update_stmt->bind_param("ss", $new_password, $staffno);
 
         if ($update_stmt->execute()) {
-            // Log the password change in audit trail
+            // log password change in audit trail
             $audit_sql = "INSERT INTO audit_log (user_id, action, table_name, record_id, old_value, new_value, ip_address)
                           VALUES (?, 'UPDATE', 'doctor', ?, 'password', 'Password changed', ?)";
             $audit_stmt = $conn->prepare($audit_sql);
@@ -59,7 +60,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['change_password'])) {
 
             $success = 'Password changed successfully!';
 
-            // Update the doctor array with new password
+            // update doctor array so current password check works if they change again
             $doctor['password'] = $new_password;
         } else {
             $error = 'Failed to update password. Please try again.';
@@ -84,7 +85,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_profile'])) {
         $update_stmt->bind_param("sss", $firstname, $lastname, $staffno);
 
         if ($update_stmt->execute()) {
-            // Log the profile update in audit trail
+            // log profile update in audit trail
             $audit_sql = "INSERT INTO audit_log (user_id, action, table_name, record_id, new_value, ip_address)
                           VALUES (?, 'UPDATE', 'doctor', ?, 'Profile updated', ?)";
             $audit_stmt = $conn->prepare($audit_sql);
@@ -110,14 +111,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_profile'])) {
     }
 }
 
-// Set page variables for header
+// setup page title
 $page_title = 'My Profile - QMC Hospital Management System';
 $extra_css = [];
 
-// Include header
+// load header
 require_once 'includes/header.php';
 
-// Include navbar
+// load navbar
 require_once 'includes/navbar.php';
 ?>
 

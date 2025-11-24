@@ -1,7 +1,7 @@
 <?php
 session_start();
 
-// Check if user is logged in
+// check if user logged in
 if (!isset($_SESSION['staffno'])) {
     header('Location: index.php');
     exit();
@@ -12,12 +12,13 @@ require_once 'db.inc.php';
 $staffno = $_SESSION['staffno'];
 $ward_id = isset($_GET['wardid']) ? intval($_GET['wardid']) : 0;
 
+// if no ward id provided, go back to ward dashboard
 if ($ward_id === 0) {
     header('Location: ward_dashboard.php');
     exit();
 }
 
-// Get ward information
+// get ward information from database
 $ward_sql = "SELECT w.*, a.street, a.city, a.postcode, d.name as department_name
              FROM ward w
              LEFT JOIN address a ON w.address_id = a.address_id
@@ -28,6 +29,7 @@ $ward_stmt->bind_param("i", $ward_id);
 $ward_stmt->execute();
 $ward_result = $ward_stmt->get_result();
 
+// if ward doesnt exist, redirect back
 if ($ward_result->num_rows === 0) {
     header('Location: ward_dashboard.php');
     exit();
@@ -36,7 +38,7 @@ if ($ward_result->num_rows === 0) {
 $ward = $ward_result->fetch_assoc();
 $ward_stmt->close();
 
-// Get current patients in this ward
+// get all patients currently admitted to this ward
 $patients_sql = "SELECT wpa.*, p.firstname, p.lastname, p.NHSno, p.phone,
                  d.firstname as consultant_firstname, d.lastname as consultant_lastname,
                  DATEDIFF(CURDATE(), wpa.date) as days_admitted
@@ -55,7 +57,7 @@ while ($row = $patients_result->fetch_assoc()) {
 }
 $patients_stmt->close();
 
-// Get doctors assigned to this ward
+// get all doctors assigned to this ward
 $doctors_sql = "SELECT d.staffno, d.firstname, d.lastname, d.consultantstatus,
                 s.specialisation_name, d.username
                 FROM doctor d
@@ -97,10 +99,11 @@ $occupied_beds = count($current_patients);
 $available_beds = $total_beds - $occupied_beds;
 $occupancy_rate = $total_beds > 0 ? round(($occupied_beds / $total_beds) * 100, 1) : 0;
 
-// Set page variables for header
+// setup page title
 $page_title = htmlspecialchars($ward['wardname']) . ' - Ward Details';
 $extra_css = [];
 
+// load templates
 require_once 'includes/header.php';
 require_once 'includes/navbar.php';
 ?>

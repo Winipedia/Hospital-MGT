@@ -1,7 +1,7 @@
 <?php
 session_start();
 
-// Check if user is logged in
+// check if user logged in
 if (!isset($_SESSION['staffno'])) {
     header('Location: index.php');
     exit();
@@ -9,20 +9,22 @@ if (!isset($_SESSION['staffno'])) {
 
 require_once 'db.inc.php';
 
+// setup variables for patient data
 $patient = null;
 $ward_admissions = [];
 $tests = [];
 $error = '';
 
-// Get NHS number from URL
+// get NHS number from url parameter
 $nhs_no = $_GET['nhs'] ?? '';
 
+// if no NHS number provided, send back to search page
 if (empty($nhs_no)) {
     header('Location: patient_search.php');
     exit();
 }
 
-// Get patient information
+// fetch patient info from database
 $patient_sql = "SELECT p.*, g.gender_name, a.street, a.city, a.postcode
                 FROM patient p
                 LEFT JOIN gender g ON p.gender_id = g.gender_id
@@ -34,12 +36,13 @@ $patient_stmt->bind_param("s", $nhs_no);
 $patient_stmt->execute();
 $patient_result = $patient_stmt->get_result();
 
+// check if patient exists
 if ($patient_result->num_rows === 0) {
     $error = 'Patient not found';
 } else {
     $patient = $patient_result->fetch_assoc();
 
-    // Get ward admissions
+    // get all ward admissions for this patient
     $ward_sql = "SELECT w.*, wa.wardname, wa.phone as ward_phone,
                  d.firstname as consultant_firstname, d.lastname as consultant_lastname,
                  DATEDIFF(CURDATE(), w.date) as days_admitted
@@ -56,7 +59,7 @@ if ($patient_result->num_rows === 0) {
     $ward_admissions = $ward_result->fetch_all(MYSQLI_ASSOC);
     $ward_stmt->close();
 
-    // Get tests
+    // get all tests prescribed to this patient
     $test_sql = "SELECT pt.*, t.testname,
                  d.firstname as doctor_firstname, d.lastname as doctor_lastname
                  FROM patient_test pt
@@ -72,7 +75,7 @@ if ($patient_result->num_rows === 0) {
     $tests = $test_result->fetch_all(MYSQLI_ASSOC);
     $test_stmt->close();
 
-    // Log the view in audit trail
+    // log the view in audit trail
     $audit_sql = "INSERT INTO audit_log (user_id, action, table_name, record_id, new_value, ip_address)
                   VALUES (?, 'SELECT', 'patient', ?, ?, ?)";
     $audit_stmt = $conn->prepare($audit_sql);
@@ -85,14 +88,14 @@ if ($patient_result->num_rows === 0) {
 
 $patient_stmt->close();
 
-// Set page variables for header
+// setup page title
 $page_title = 'Patient Information - QMC Hospital Management System';
 $extra_css = [];
 
-// Include header
+// load header
 require_once 'includes/header.php';
 
-// Include navbar
+// load navbar
 require_once 'includes/navbar.php';
 ?>
 

@@ -1,7 +1,7 @@
 <?php
 session_start();
 
-// Check if user is logged in
+// check if user logged in
 if (!isset($_SESSION['staffno'])) {
     header('Location: index.php');
     exit();
@@ -9,22 +9,23 @@ if (!isset($_SESSION['staffno'])) {
 
 require_once 'db.inc.php';
 
+// setup message variables
 $success = '';
 $error = '';
 $staffno = $_SESSION['staffno'];
 
-// Handle new parking permit request
+// handle when doctor submits new parking permit request
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['request_permit'])) {
     $car_registration = strtoupper(trim($_POST['car_registration'] ?? ''));
     $permit_choice = $_POST['permit_choice'] ?? '';
 
-    // Validation
+    // validate the form inputs
     if (empty($car_registration)) {
         $error = 'Car registration is required';
     } elseif (!in_array($permit_choice, ['monthly', 'yearly'])) {
         $error = 'Please select a valid permit type';
     } else {
-        // Check if there's already a pending request
+        // check if doctor already has pending request, cant have multiple
         $check_sql = "SELECT permit_id FROM parking_permit
                       WHERE doctor_id = ? AND status = 'pending'";
         $check_stmt = $conn->prepare($check_sql);
@@ -35,17 +36,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['request_permit'])) {
         if ($check_result->num_rows > 0) {
             $error = 'You already have a pending parking permit request';
         } else {
-            // Calculate amount based on permit choice
+            // calculate cost - monthly is 50, yearly is 500
             $amount = ($permit_choice === 'monthly') ? 50.00 : 500.00;
 
-            // Insert new parking permit request
+            // insert the new permit request into database
             $insert_sql = "INSERT INTO parking_permit (doctor_id, car_registration, permit_choice, amount, status)
                           VALUES (?, ?, ?, ?, 'pending')";
             $insert_stmt = $conn->prepare($insert_sql);
             $insert_stmt->bind_param("sssd", $staffno, $car_registration, $permit_choice, $amount);
 
             if ($insert_stmt->execute()) {
-                // Log the request in audit trail
+                // log this request in audit trail
                 $audit_sql = "INSERT INTO audit_log (user_id, action, table_name, record_id, new_value, ip_address)
                               VALUES (?, 'INSERT', 'parking_permit', ?, ?, ?)";
                 $audit_stmt = $conn->prepare($audit_sql);
@@ -68,11 +69,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['request_permit'])) {
     }
 }
 
-// Handle cancel request
+// handle canceling a pending request
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['cancel_request'])) {
     $permit_id = $_POST['permit_id'] ?? 0;
 
-    // Verify the permit belongs to this doctor and is pending
+    // make sure permit belongs to this doctor and is still pending
     $verify_sql = "SELECT permit_id FROM parking_permit
                    WHERE permit_id = ? AND doctor_id = ? AND status = 'pending'";
     $verify_stmt = $conn->prepare($verify_sql);
@@ -81,13 +82,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['cancel_request'])) {
     $verify_result = $verify_stmt->get_result();
 
     if ($verify_result->num_rows > 0) {
-        // Delete the pending request
+        // ok its valid, delete the pending request
         $delete_sql = "DELETE FROM parking_permit WHERE permit_id = ?";
         $delete_stmt = $conn->prepare($delete_sql);
         $delete_stmt->bind_param("i", $permit_id);
 
         if ($delete_stmt->execute()) {
-            // Log the cancellation
+            // log the cancellation in audit trail
             $audit_sql = "INSERT INTO audit_log (user_id, action, table_name, record_id, new_value, ip_address)
                           VALUES (?, 'DELETE', 'parking_permit', ?, 'Cancelled parking permit request', ?)";
             $audit_stmt = $conn->prepare($audit_sql);
@@ -109,7 +110,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['cancel_request'])) {
     $verify_stmt->close();
 }
 
-// Get all parking permit requests for this doctor
+// fetch all parking permits for this doctor to display
 $permits_sql = "SELECT pp.*, d.firstname, d.lastname,
                 CONCAT(d.firstname, ' ', d.lastname) as approved_by_name
                 FROM parking_permit pp
@@ -123,14 +124,14 @@ $permits_result = $permits_stmt->get_result();
 $permits = $permits_result->fetch_all(MYSQLI_ASSOC);
 $permits_stmt->close();
 
-// Set page variables for header
+// setup page title and css
 $page_title = 'Parking Permit - QMC Hospital Management System';
 $extra_css = [];
 
-// Include header
+// load header template
 require_once 'includes/header.php';
 
-// Include navbar
+// load navbar
 require_once 'includes/navbar.php';
 ?>
 

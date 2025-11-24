@@ -1,11 +1,12 @@
 <?php
 session_start();
 
-// Log the logout in audit trail if user is logged in
+// log the logout action if user was logged in
 if (isset($_SESSION['staffno'])) {
     require_once 'db.inc.php';
-    
-    $audit_sql = "INSERT INTO audit_log (user_id, action, table_name, record_id, new_value, ip_address) 
+
+    // insert logout event into audit log
+    $audit_sql = "INSERT INTO audit_log (user_id, action, table_name, record_id, new_value, ip_address)
                   VALUES (?, 'LOGOUT', 'doctor', ?, ?, ?)";
     $audit_stmt = $conn->prepare($audit_sql);
     $ip_address = $_SERVER['REMOTE_ADDR'];
@@ -16,11 +17,11 @@ if (isset($_SESSION['staffno'])) {
     $conn->close();
 }
 
-// Destroy all session data
+// clear all session data and destroy session
 session_unset();
 session_destroy();
 
-// Redirect to login page
+// send user back to login page
 header('Location: index.php');
 exit();
 ?>

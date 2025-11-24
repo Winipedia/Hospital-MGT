@@ -1,28 +1,29 @@
 <?php
 session_start();
 
-// If already logged in, redirect to dashboard
+// if user already logged in, just send them to dashboard
 if (isset($_SESSION['staffno'])) {
     header('Location: dashboard.php');
     exit();
 }
 
-// Initialize variables
+// setup variables for login form
 $error = '';
 $username = '';
 
-// Handle login form submission
+// handle login when form is submitted
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     require_once 'db.inc.php';
 
+    // get username and password from form
     $username = trim($_POST['username'] ?? '');
     $password = $_POST['password'] ?? '';
 
-    // Validate input
+    // make sure both fields are filled in
     if (empty($username) || empty($password)) {
         $error = 'Please enter both username and password.';
     } else {
-        // Query database for user
+        // look up user in database with all there info
         $sql = "SELECT d.staffno, d.username, d.password, d.firstname, d.lastname, d.is_admin,
                        s.specialisation_name, w.wardname
                 FROM doctor d
@@ -35,12 +36,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $stmt->execute();
         $result = $stmt->get_result();
 
+        // check if we found exactly one user
         if ($result->num_rows === 1) {
             $user = $result->fetch_assoc();
 
-            // Check password (plain text as per coursework requirements)
+            // check password - plain text cuz coursework doesnt need security
             if ($password === $user['password']) {
-                // Login successful - set session variables
+                // login worked! setup all session variables
                 $_SESSION['staffno'] = $user['staffno'];
                 $_SESSION['username'] = $user['username'];
                 $_SESSION['firstname'] = $user['firstname'];
@@ -50,7 +52,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $_SESSION['ward'] = $user['wardname'];
                 $_SESSION['login_time'] = date('Y-m-d H:i:s');
 
-                // Log the login in audit trail
+                // log the login event for audit trail
                 $audit_sql = "INSERT INTO audit_log (user_id, action, table_name, record_id, new_value, ip_address)
                               VALUES (?, 'LOGIN', 'doctor', ?, ?, ?)";
                 $audit_stmt = $conn->prepare($audit_sql);
@@ -60,7 +62,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $audit_stmt->execute();
                 $audit_stmt->close();
 
-                // Redirect to dashboard
+                // send user to dashboard
                 header('Location: dashboard.php');
                 exit();
             } else {
@@ -75,11 +77,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-// Set page variables for header
+// setup page title and css
 $page_title = 'Login - QMC Hospital Management System';
 $extra_css = ['login.css'];
 
-// Include header
+// load header template
 require_once 'includes/header.php';
 ?>
     <div class="login-container">

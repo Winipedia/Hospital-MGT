@@ -1,7 +1,7 @@
 <?php
 session_start();
 
-// Check if user is logged in
+// make sure user is actually logged in before they can do anything
 if (!isset($_SESSION['staffno'])) {
     header('Location: index.php');
     exit();
@@ -9,18 +9,19 @@ if (!isset($_SESSION['staffno'])) {
 
 require_once 'db.inc.php';
 
+// setup message variables for feedback
 $success = '';
 $error = '';
 $step = 1; // Step 1: Choose action, Step 2: Add patient, Step 3: Prescribe test
 
-// Handle creating new test
+// so this handles when someone wants to create a new test type
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['create_test'])) {
     $testname = trim($_POST['testname'] ?? '');
 
     if (empty($testname)) {
         $error = 'Test name is required';
     } else {
-        // Check if test already exists
+        // gotta check if test already exists, dont want duplicates
         $check_sql = "SELECT testid FROM test WHERE testname = ?";
         $check_stmt = $conn->prepare($check_sql);
         $check_stmt->bind_param("s", $testname);
@@ -30,7 +31,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['create_test'])) {
         if ($check_result->num_rows > 0) {
             $error = 'A test with this name already exists';
         } else {
-            // Insert new test
+            // ok test doesnt exist, lets add it to database
             $insert_sql = "INSERT INTO test (testname) VALUES (?)";
             $insert_stmt = $conn->prepare($insert_sql);
             $insert_stmt->bind_param("s", $testname);
@@ -39,7 +40,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['create_test'])) {
                 $new_test_id = $insert_stmt->insert_id;
                 $success = "Test '$testname' created successfully! (Test ID: $new_test_id)";
 
-                // Audit log
+                // log this action for audit trail
                 $audit_sql = "INSERT INTO audit_log (user_id, action, table_name, record_id, new_value, ip_address)
                               VALUES (?, 'INSERT', 'test', ?, ?, ?)";
                 $audit_stmt = $conn->prepare($audit_sql);
@@ -57,8 +58,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['create_test'])) {
     }
 }
 
-// Handle adding new patient
+// this part handles adding a new patient to the system
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_patient'])) {
+    // grab all the form data and clean it up
     $nhs_no = strtoupper(trim($_POST['nhs_no'] ?? ''));
     $firstname = trim($_POST['firstname'] ?? '');
     $lastname = trim($_POST['lastname'] ?? '');
@@ -70,10 +72,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_patient'])) {
     $city = trim($_POST['city'] ?? '');
     $postcode = trim($_POST['postcode'] ?? '');
 
+    // basic validation - cant add patient without these fields
     if (empty($nhs_no) || empty($firstname) || empty($phone) || $age <= 0) {
         $error = 'NHS Number, First Name, Phone, and Age are required';
     } else {
-        // Check if patient already exists
+        // check if patient already in system, NHS number should be unique
         $check_sql = "SELECT NHSno FROM patient WHERE NHSno = ?";
         $check_stmt = $conn->prepare($check_sql);
         $check_stmt->bind_param("s", $nhs_no);
@@ -83,7 +86,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_patient'])) {
         if ($check_result->num_rows > 0) {
             $error = "Patient with NHS Number $nhs_no already exists in the system";
         } else {
-            // Insert address first
+            // need to insert address first cuz patient table references it
             $address_sql = "INSERT INTO address (street, city, postcode) VALUES (?, ?, ?)";
             $address_stmt = $conn->prepare($address_sql);
             $address_stmt->bind_param("sss", $street, $city, $postcode);
@@ -91,7 +94,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_patient'])) {
             $address_id = $address_stmt->insert_id;
             $address_stmt->close();
 
-            // Insert patient
+            // now insert the patient record with the address id
             $patient_sql = "INSERT INTO patient (NHSno, firstname, lastname, phone, address_id, age, gender_id, emergencyphone)
                            VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
             $patient_stmt = $conn->prepare($patient_sql);
@@ -102,7 +105,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_patient'])) {
             if ($patient_stmt->execute()) {
                 $success = "Patient '$firstname $lastname' (NHS: $nhs_no) added successfully!";
 
-                // Audit log
+                // log the patient creation for audit purposes
                 $audit_sql = "INSERT INTO audit_log (user_id, action, table_name, record_id, new_value, ip_address)
                               VALUES (?, 'INSERT', 'patient', ?, ?, ?)";
                 $audit_stmt = $conn->prepare($audit_sql);
@@ -120,16 +123,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_patient'])) {
     }
 }
 
-// Handle prescribing test to patient
+// this handles prescribing a test to an existing patient
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['prescribe_test'])) {
     $patient_nhs = trim($_POST['patient_nhs'] ?? '');
     $test_id = intval($_POST['test_id'] ?? 0);
     $test_date = $_POST['test_date'] ?? date('Y-m-d');
 
+    // make sure we got both patient and test selected
     if (empty($patient_nhs) || $test_id <= 0) {
         $error = 'Please select both a patient and a test';
     } else {
-        // Check if patient exists
+        // verify patient actually exists before prescribing anything
         $check_patient_sql = "SELECT NHSno, firstname, lastname FROM patient WHERE NHSno = ?";
         $check_patient_stmt = $conn->prepare($check_patient_sql);
         $check_patient_stmt->bind_param("s", $patient_nhs);
@@ -143,13 +147,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['prescribe_test'])) {
 
 
 
-            // Insert test prescription
+            // ok patient exists, lets prescribe the test
             $prescribe_sql = "INSERT INTO patient_test (pid, testid, date, doctorid) VALUES (?, ?, ?, ?)";
             $prescribe_stmt = $conn->prepare($prescribe_sql);
             $prescribe_stmt->bind_param("siss", $patient_nhs, $test_id, $test_date, $_SESSION['staffno']);
 
             if ($prescribe_stmt->execute()) {
-                // Get test name
+                // need to get test name for the success mesage
                 $test_name_sql = "SELECT testname FROM test WHERE testid = ?";
                 $test_name_stmt = $conn->prepare($test_name_sql);
                 $test_name_stmt->bind_param("i", $test_id);
@@ -160,7 +164,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['prescribe_test'])) {
 
                 $success = "Test '$test_name' prescribed to {$patient_data['firstname']} {$patient_data['lastname']} (NHS: $patient_nhs) for $test_date";
 
-                // Audit log
+                // log this prescription in audit trail
                 $audit_sql = "INSERT INTO audit_log (user_id, action, table_name, record_id, new_value, ip_address)
                               VALUES (?, 'INSERT', 'patient_test', ?, ?, ?)";
                 $audit_stmt = $conn->prepare($audit_sql);
@@ -178,24 +182,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['prescribe_test'])) {
     }
 }
 
-// Get all tests for dropdown
+// fetch all tests from database for the dropdown menu
 $tests_sql = "SELECT testid, testname FROM test ORDER BY testname";
 $tests_result = $conn->query($tests_sql);
 $all_tests = $tests_result->fetch_all(MYSQLI_ASSOC);
 
-// Get all genders for dropdown
+// get gender options for patient form
 $genders_sql = "SELECT gender_id, gender_name FROM gender ORDER BY gender_name";
 $genders_result = $conn->query($genders_sql);
 $all_genders = $genders_result->fetch_all(MYSQLI_ASSOC);
 
-// Set page variables for header
+// setup page title
 $page_title = 'Add Test & Prescribe - QMC Hospital Management System';
 $extra_css = [];
 
-// Include header
+// load header
 require_once 'includes/header.php';
 
-// Include navbar
+// load navbar
 require_once 'includes/navbar.php';
 ?>
 

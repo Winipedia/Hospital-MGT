@@ -1,27 +1,27 @@
 <?php
 session_start();
 
-// Check if user is logged in
+// make sure user is logged in before showing dashboard
 if (!isset($_SESSION['staffno'])) {
     header('Location: index.php');
     exit();
 }
 
-// Get user information from session
+// grab user info from session to display on page
 $firstname = $_SESSION['firstname'];
 $lastname = $_SESSION['lastname'];
 $is_admin = $_SESSION['is_admin'];
 $specialisation = $_SESSION['specialisation'] ?? 'N/A';
 $ward = $_SESSION['ward'] ?? 'N/A';
 
-// Set page variables for header
+// setup page title and extra css files
 $page_title = 'Dashboard - QMC Hospital Management System';
 $extra_css = ['dashboard.css'];
 
-// Include header
+// load the header template
 require_once 'includes/header.php';
 
-// Include navbar
+// load navbar with user info
 require_once 'includes/navbar.php';
 ?>
 

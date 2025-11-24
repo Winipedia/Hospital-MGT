@@ -1,7 +1,7 @@
 <?php
 session_start();
 
-// Check if user is logged in
+// check if user logged in
 if (!isset($_SESSION['staffno'])) {
     header('Location: ../index.php');
     exit();
@@ -9,7 +9,7 @@ if (!isset($_SESSION['staffno'])) {
 
 require_once '../db.inc.php';
 
-// Check if user is admin
+// check if user is admin by querying database
 $staffno = $_SESSION['staffno'];
 $admin_check_sql = "SELECT is_admin FROM doctor WHERE staffno = ?";
 $admin_check_stmt = $conn->prepare($admin_check_sql);
@@ -19,22 +19,24 @@ $admin_result = $admin_check_stmt->get_result();
 $admin_data = $admin_result->fetch_assoc();
 $admin_check_stmt->close();
 
+// if not admin, redirect to dashboard
 if (!$admin_data || $admin_data['is_admin'] != 1) {
     header('Location: ../dashboard.php');
     exit();
 }
 
+// setup message variables
 $success = '';
 $error = '';
 
-// Handle approve request
+// handle approve permit form submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['approve_permit'])) {
     $permit_id = intval($_POST['permit_id'] ?? 0);
     $permit_number = strtoupper(trim($_POST['permit_number'] ?? ''));
     $activation_date = date('Y-m-d');
 
     if ($permit_id > 0 && !empty($permit_number)) {
-        // Check if permit number already exists
+        // make sure permit number isnt already in use
         $check_permit_sql = "SELECT permit_id FROM parking_permit WHERE permit_number = ?";
         $check_permit_stmt = $conn->prepare($check_permit_sql);
         $check_permit_stmt->bind_param("s", $permit_number);
@@ -44,7 +46,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['approve_permit'])) {
         if ($check_permit_result->num_rows > 0) {
             $error = "Permit number '$permit_number' already exists. Please use a unique permit number.";
         } else {
-            // Get permit details
+            // get permit details to check if its pending
             $permit_sql = "SELECT permit_choice FROM parking_permit WHERE permit_id = ? AND status = 'pending'";
             $permit_stmt = $conn->prepare($permit_sql);
             $permit_stmt->bind_param("i", $permit_id);
@@ -54,14 +56,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['approve_permit'])) {
             if ($permit_result->num_rows > 0) {
                 $permit_data = $permit_result->fetch_assoc();
 
-                // Calculate end date based on permit choice
+                // calculate end date - monthly is 30 days, yearly is 365 days
                 if ($permit_data['permit_choice'] === 'monthly') {
                     $end_date = date('Y-m-d', strtotime('+30 days'));
                 } else {
                     $end_date = date('Y-m-d', strtotime('+365 days'));
                 }
 
-                // Update permit status
+                // update permit to approved status
                 $update_sql = "UPDATE parking_permit
                               SET status = 'approved',
                                   approved_by = ?,
@@ -166,15 +168,15 @@ $processed_sql = "SELECT pp.*,
 $processed_result = $conn->query($processed_sql);
 $processed_permits = $processed_result->fetch_all(MYSQLI_ASSOC);
 
-// Set page variables for header
+// setup page title
 $page_title = 'Parking Permit Approvals - QMC Hospital Management System';
 $extra_css = [];
-$css_path_prefix = '../'; // For admin subdirectory
+$css_path_prefix = '../'; // for admin subdirectory
 
-// Include header
+// load header
 require_once '../includes/header.php';
 
-// Include navbar
+// load navbar
 require_once '../includes/navbar.php';
 ?>
 

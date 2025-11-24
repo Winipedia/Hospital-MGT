@@ -5,23 +5,23 @@
  * COMP4039 Coursework
  */
 
-// Database configuration
+// database config - using docker mariadb container
 $db_host = 'mariadb';  // Docker service name
 $db_user = 'root';
 $db_pass = 'rootpwd';  // From docker-compose.yml MYSQL_ROOT_PASSWORD
 $db_name = 'hospital';
 
-// Create connection
+// create the mysql connection
 $conn = new mysqli($db_host, $db_user, $db_pass, $db_name);
 
-// Check connection
+// check if connection worked, die if it didnt
 if ($conn->connect_error) {
     die("Database connection failed: " . $conn->connect_error);
 }
 
-// Set charset to UTF-8
+// set charset so we dont get weird encoding issues
 $conn->set_charset("utf8mb4");
 
-// Enable exception mode for better error handling
+// turn on exceptions for better error handeling
 mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
 // No closing PHP tag to prevent whitespace issues with header() redirects

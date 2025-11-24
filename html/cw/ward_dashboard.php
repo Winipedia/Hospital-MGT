@@ -1,7 +1,7 @@
 <?php
 session_start();
 
-// Check if user is logged in
+// check if user logged in
 if (!isset($_SESSION['staffno'])) {
     header('Location: index.php');
     exit();
@@ -11,7 +11,7 @@ require_once 'db.inc.php';
 
 $staffno = $_SESSION['staffno'];
 
-// Get all wards with statistics
+// get all wards with stats like patient count and doctor count
 $wards_sql = "SELECT w.wardid, w.wardname, w.phone, w.noofbeds,
                      a.street, a.city, a.postcode,
                      d.name as department_name,
@@ -30,24 +30,27 @@ while ($row = $wards_result->fetch_assoc()) {
     $wards[] = $row;
 }
 
-// Get overall statistics
+// calculate overall statistics across all wards
 $total_beds = 0;
 $total_occupied = 0;
 $total_wards = count($wards);
 $total_doctors_all = 0;
 
+// loop through wards and sum up the totals
 foreach ($wards as $ward) {
     $total_beds += $ward['noofbeds'] ?? 0;
     $total_occupied += $ward['current_patients'];
     $total_doctors_all += $ward['total_doctors'];
 }
 
+// calculate occupancy percentage
 $occupancy_rate = $total_beds > 0 ? round(($total_occupied / $total_beds) * 100, 1) : 0;
 
-// Set page variables for header
+// setup page title
 $page_title = 'Ward Dashboard - QMC Hospital Management System';
 $extra_css = [];
 
+// load templates
 require_once 'includes/header.php';
 require_once 'includes/navbar.php';
 ?>

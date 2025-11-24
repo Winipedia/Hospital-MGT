@@ -1,13 +1,13 @@
 <?php
 session_start();
 
-// Check if user is logged in
+// check if user logged in
 if (!isset($_SESSION['staffno'])) {
     header('Location: ../index.php');
     exit();
 }
 
-// Check if user is admin
+// only admins can view audit log
 if (!isset($_SESSION['is_admin']) || $_SESSION['is_admin'] != 1) {
     header('Location: ../dashboard.php');
     exit();
@@ -17,53 +17,59 @@ require_once '../db.inc.php';
 
 $staffno = $_SESSION['staffno'];
 
-// Pagination settings
+// setup pagination - showing 50 records per page
 $records_per_page = 50;
 $page = isset($_GET['page']) ? max(1, intval($_GET['page'])) : 1;
 $offset = ($page - 1) * $records_per_page;
 
-// Filter parameters
+// get filter parameters from url
 $filter_user = isset($_GET['user']) ? trim($_GET['user']) : '';
 $filter_action = isset($_GET['action']) ? trim($_GET['action']) : '';
 $filter_table = isset($_GET['table']) ? trim($_GET['table']) : '';
 $filter_date_from = isset($_GET['date_from']) ? trim($_GET['date_from']) : '';
 $filter_date_to = isset($_GET['date_to']) ? trim($_GET['date_to']) : '';
 
-// Build WHERE clause
+// build WHERE clause dynamically based on filters
 $where_conditions = [];
 $params = [];
 $types = '';
 
+// add user filter if provided
 if (!empty($filter_user)) {
     $where_conditions[] = "a.user_id = ?";
     $params[] = $filter_user;
     $types .= 's';
 }
 
+// add action filter if provided
 if (!empty($filter_action)) {
     $where_conditions[] = "a.action = ?";
     $params[] = $filter_action;
     $types .= 's';
 }
 
+// add table filter if provided
 if (!empty($filter_table)) {
     $where_conditions[] = "a.table_name = ?";
     $params[] = $filter_table;
     $types .= 's';
 }
 
+// add date from filter if provided
 if (!empty($filter_date_from)) {
     $where_conditions[] = "DATE(a.timestamp) >= ?";
     $params[] = $filter_date_from;
     $types .= 's';
 }
 
+// add date to filter if provided
 if (!empty($filter_date_to)) {
     $where_conditions[] = "DATE(a.timestamp) <= ?";
     $params[] = $filter_date_to;
     $types .= 's';
 }
 
+// combine all conditions into WHERE clause
 $where_clause = count($where_conditions) > 0 ? 'WHERE ' . implode(' AND ', $where_conditions) : '';
 
 // Get total count for pagination
@@ -140,11 +146,12 @@ $stats_sql = "SELECT
 $stats_result = $conn->query($stats_sql);
 $stats = $stats_result->fetch_assoc();
 
-// Set page variables for header
+// setup page title
 $page_title = 'Audit Trail - QMC Hospital Management System';
 $extra_css = [];
 $css_path_prefix = '../';
 
+// load templates
 require_once '../includes/header.php';
 require_once '../includes/navbar.php';
 ?>
