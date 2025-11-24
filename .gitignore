@@ -1,0 +1,5 @@
+html/cw/vendor/
+html/cw/.php-cs-fixer.cache
+node_modules/
+mariadb-data/
+
