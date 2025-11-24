@@ -35,6 +35,9 @@ services:
       PMA_HOST: mariadb
       PMA_USER: root
       PMA_PASSWORD: rootpwd
+      PMA_ARBITRARY: 1
+      LANG: en_US.UTF-8
+      LANGUAGE: en_US:en
     ports:
       - 8081:80
 
