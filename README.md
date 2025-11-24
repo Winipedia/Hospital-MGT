@@ -1,68 +1,77 @@
-# Queen's Medical Centre - Hospital Management System
+# COMP4039-DIS Docker
 
-A web-based hospital management system built with PHP, MariaDB, and Docker for COMP4039 coursework.
+## author: Stuart Reeves
 
-## Quick Start
+Docker files for COMP4039-DIS (Databases, Interfaces and Software Design Principles) L4 module.
 
-1. **Start the system:**
-   ```bash
-   docker-compose up -d
-   ```
+Contains the principal components of the standard LAMP (Linux, Apache, MySQL, PHP) stack:
+- apache2 (web server)
+- mariadb v10 (OSS MySQL server)
+- php v8
 
-2. **Access the application:**
-   - Web Interface: http://localhost/cw/
-   - phpMyAdmin: http://localhost:8081/
+The Docker compose file describing this (docker-compose.yml) also builds phpmyadmin, which provides a web-based GUI for the SQL database.
 
-## Features
+In order to start the container you will need to download Docker. This could either be the desktop app (https://www.docker.com/products/docker-desktop/) or, depending on your OS, some other method e.g., via homebrew for macOS or via a packaging system if you run Linux.
 
-### For Doctors:
-- **Profile Management** - Update personal details and change password
-- **Parking Permits** - Request monthly (£50) or yearly (£500) parking permits
-- **Patient Search** - Search and view patient information
-- **Patient Details** - View patient records, ward history, and test results
-- **Add Tests** - Create new test types and prescribe tests to patients
+Once Docker is installed, run
 
-### For Administrators:
-- **Create Doctor Accounts** - Add new doctors to the system
-- **Parking Approvals** - Approve/reject parking permit requests
-- **Audit Trail** - View complete database activity logs with filtering
+	docker compose up
 
-## Database
-- **Schema:** Fully normalized to BCNF with 13 tables
-- **Audit Logging:** All database operations are logged for compliance
+at your command line. The relevant images will be pulled down (php-apache, mariadb, phpmyadmin), then the containers will be started. This should all be visible in the Docker desktop app.
 
-## Technology Stack
+You can now point a browser at the following locations:
 
-- **Backend:** PHP 8.2
-- **Database:** MariaDB 10.4
-- **Web Server:** Apache 2.4
-- **Container:** Docker & Docker Compose
-- **Admin Tool:** phpMyAdmin
+	http://localhost/index.php - index to the example code included
+	http://localhost:8081 - phpmyadmin interface
 
-## Project Structure
 
-```
-html/cw/
-├── index.php              # Login page
-├── dashboard.php          # Main dashboard
-├── profile.php            # User profile management
-├── parking_permit.php     # Parking permit requests
-├── patient_search.php     # Patient search
-├── patient_info.php       # Patient details
-├── add_test.php           # Add tests and prescribe
-├── admin/
-│   ├── create_doctor.php      # Create doctor accounts
-│   ├── parking_approvals.php  # Approve parking permits
-│   └── audit_log.php          # Audit trail viewer
-├── includes/
-│   ├── header.php         # HTML header
-│   ├── navbar.php         # Navigation bar
-│   └── footer.php         # HTML footer
-└── assets/css/            # Stylesheets
-```
+## Contents description
 
-## Stopping the System
+html/ - all your HTML, PHP, CSS, JS etc. files go here (note that this dir includes example code from the module which you can use without citation in your coursework)
 
-```bash
-docker-compose down
-```
+html/cw2/ - this is where you should put your Coursework 2 files
+
+mariadb/ - SQL files that are used to build the database when Docker starts; this includes the initial database for Coursework 2 which you will probably want to modify, as well as the database for the example code (phpdemos); also contains instructions to build the mariadb image
+
+mariadb-data/ - this is where the mariadb Docker container's database stores its files; if you want to rebuild your databases from scratch, see below for instructions
+
+php-apache/ - contains the instructions to build the php-apache image
+
+
+## Deleting the database and rebuilding
+
+If for whatever reason you want to delete your database and rebuild from the SQL source included in mariadb/ then simply delete the contents of mariadb-data and run 
+	
+	docker compose up
+
+again.
+
+
+## Where is my Docker running from?
+
+If you have trouble getting pages to load in your browser it may be that you have more than one Docker folder. You can check what part of your filesystem your containers are mapped to with the following command:
+
+    docker inspect -f "{{ .Mounts }}"  <your-container-id-or-name>
+
+You can find your container id (e.g., the apache one) in Docker Desktop - it's a string of numbers and letters.
+
+You can also locate the equivalent information in the Docker Desktop interface if you click on your main container - the info should be displayed near the top of the window.
+
+
+## Specific OS-related notes
+
+### Windows 
+
+If you are installing Docker for Windows, you may need to install the Windows Subsystem for Linux (WSL). You will either be told to do so or you might encounter an error related to "WSL kernel version too low" or similar. In either case you will need to run cmd.exe and the following commands:
+
+	wsl --install
+	wsl --update
+
+If you receive an "Unexpected WSL error" from Docker Desktop you may be able to resolve it by checking that virtualisation is enabled in your system BIOS. This can usually be accessed at startup via a specific key (e.g., F2) - depending on your machine.
+
+
+### macOS
+
+If you are installing Docker for macOS, some have encountered errors where Docker Desktop won't start. In which case try some of the following:
+
+	https://mattsimpson.ca/2022/12/27/docker-desktop-for-mac-wont-start
