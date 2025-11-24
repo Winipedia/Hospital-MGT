@@ -73,6 +73,12 @@ require_once 'includes/navbar.php';
                 <div class="menu-card-desc">Request a monthly or yearly parking permit</div>
             </a>
 
+            <a href="ward_dashboard.php" class="menu-card">
+                <div class="menu-card-icon">🏥</div>
+                <div class="menu-card-title">Ward Dashboard</div>
+                <div class="menu-card-desc">View all wards, bed occupancy, and patient admissions</div>
+            </a>
+
             <?php if ($is_admin): ?>
                 <a href="admin/create_doctor.php" class="menu-card" style="border-left-color: #ffd700;">
                     <div class="menu-card-icon">👨‍⚕️</div>
