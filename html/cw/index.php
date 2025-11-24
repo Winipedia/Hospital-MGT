@@ -24,15 +24,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $error = 'Please enter both username and password.';
     } else {
         // look up user in database with all there info
-        $sql = "SELECT d.staffno, d.username, d.password, d.firstname, d.lastname, d.is_admin,
+        $sql = 'SELECT d.staffno, d.username, d.password, d.firstname, d.lastname, d.is_admin,
                        s.specialisation_name, w.wardname
                 FROM doctor d
                 LEFT JOIN specialisation s ON d.specialisation_id = s.specialisation_id
                 LEFT JOIN ward w ON d.ward_id = w.wardid
-                WHERE d.username = ?";
+                WHERE d.username = ?';
 
         $stmt = $conn->prepare($sql);
-        $stmt->bind_param("s", $username);
+        $stmt->bind_param('s', $username);
         $stmt->execute();
         $result = $stmt->get_result();
 
@@ -57,8 +57,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                               VALUES (?, 'LOGIN', 'doctor', ?, ?, ?)";
                 $audit_stmt = $conn->prepare($audit_sql);
                 $ip_address = $_SERVER['REMOTE_ADDR'];
-                $login_info = "Login successful at " . $_SESSION['login_time'];
-                $audit_stmt->bind_param("ssss", $user['staffno'], $user['staffno'], $login_info, $ip_address);
+                $login_info = 'Login successful at ' . $_SESSION['login_time'];
+                $audit_stmt->bind_param('ssss', $user['staffno'], $user['staffno'], $login_info, $ip_address);
                 $audit_stmt->execute();
                 $audit_stmt->close();
 

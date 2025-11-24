@@ -36,35 +36,35 @@ $types = '';
 
 // add user filter if provided
 if (!empty($filter_user)) {
-    $where_conditions[] = "a.user_id = ?";
+    $where_conditions[] = 'a.user_id = ?';
     $params[] = $filter_user;
     $types .= 's';
 }
 
 // add action filter if provided
 if (!empty($filter_action)) {
-    $where_conditions[] = "a.action = ?";
+    $where_conditions[] = 'a.action = ?';
     $params[] = $filter_action;
     $types .= 's';
 }
 
 // add table filter if provided
 if (!empty($filter_table)) {
-    $where_conditions[] = "a.table_name = ?";
+    $where_conditions[] = 'a.table_name = ?';
     $params[] = $filter_table;
     $types .= 's';
 }
 
 // add date from filter if provided
 if (!empty($filter_date_from)) {
-    $where_conditions[] = "DATE(a.timestamp) >= ?";
+    $where_conditions[] = 'DATE(a.timestamp) >= ?';
     $params[] = $filter_date_from;
     $types .= 's';
 }
 
 // add date to filter if provided
 if (!empty($filter_date_to)) {
-    $where_conditions[] = "DATE(a.timestamp) <= ?";
+    $where_conditions[] = 'DATE(a.timestamp) <= ?';
     $params[] = $filter_date_to;
     $types .= 's';
 }
@@ -113,7 +113,7 @@ while ($row = $audit_result->fetch_assoc()) {
 $audit_stmt->close();
 
 // Get all users for filter dropdown
-$users_sql = "SELECT DISTINCT staffno, firstname, lastname FROM doctor ORDER BY firstname, lastname";
+$users_sql = 'SELECT DISTINCT staffno, firstname, lastname FROM doctor ORDER BY firstname, lastname';
 $users_result = $conn->query($users_sql);
 $users = [];
 while ($row = $users_result->fetch_assoc()) {
@@ -121,7 +121,7 @@ while ($row = $users_result->fetch_assoc()) {
 }
 
 // Get all actions for filter dropdown
-$actions_sql = "SELECT DISTINCT action FROM audit_log ORDER BY action";
+$actions_sql = 'SELECT DISTINCT action FROM audit_log ORDER BY action';
 $actions_result = $conn->query($actions_sql);
 $actions = [];
 while ($row = $actions_result->fetch_assoc()) {
@@ -129,7 +129,7 @@ while ($row = $actions_result->fetch_assoc()) {
 }
 
 // Get all tables for filter dropdown
-$tables_sql = "SELECT DISTINCT table_name FROM audit_log WHERE table_name IS NOT NULL ORDER BY table_name";
+$tables_sql = 'SELECT DISTINCT table_name FROM audit_log WHERE table_name IS NOT NULL ORDER BY table_name';
 $tables_result = $conn->query($tables_sql);
 $tables = [];
 while ($row = $tables_result->fetch_assoc()) {
@@ -137,12 +137,12 @@ while ($row = $tables_result->fetch_assoc()) {
 }
 
 // Get statistics
-$stats_sql = "SELECT 
+$stats_sql = 'SELECT 
                 COUNT(*) as total_logs,
                 COUNT(DISTINCT user_id) as total_users,
                 COUNT(DISTINCT DATE(timestamp)) as days_logged,
                 MAX(timestamp) as last_activity
-              FROM audit_log";
+              FROM audit_log';
 $stats_result = $conn->query($stats_sql);
 $stats = $stats_result->fetch_assoc();
 
@@ -307,10 +307,10 @@ require_once '../includes/navbar.php';
                                             'INSERT' => 'badge-primary',
                                             'UPDATE' => 'badge-warning',
                                             'DELETE' => 'badge-danger',
-                                            'SELECT' => 'badge-info'
+                                            'SELECT' => 'badge-info',
                                         ];
-                                        $badge_class = $action_colors[$log['action']] ?? 'badge-secondary';
-                                        ?>
+                                $badge_class = $action_colors[$log['action']] ?? 'badge-secondary';
+                                ?>
                                         <span class="badge <?php echo $badge_class; ?>">
                                             <?php echo htmlspecialchars($log['action']); ?>
                                         </span>
@@ -377,35 +377,35 @@ require_once '../includes/navbar.php';
         <div class="card-body">
             <?php
             // Get action summary
-            $summary_where = count($where_conditions) > 0 ? 'WHERE ' . implode(' AND ', array_map(function($cond) {
+            $summary_where = count($where_conditions) > 0 ? 'WHERE ' . implode(' AND ', array_map(function ($cond) {
                 return str_replace('a.', '', $cond);
             }, $where_conditions)) : '';
 
-            $summary_sql = "SELECT action, COUNT(*) as count
+$summary_sql = "SELECT action, COUNT(*) as count
                            FROM audit_log
                            $summary_where
                            GROUP BY action
                            ORDER BY count DESC";
-            $summary_stmt = $conn->prepare($summary_sql);
+$summary_stmt = $conn->prepare($summary_sql);
 
-            if (!empty($types) && count($where_conditions) > 0) {
-                // Remove the last two 'ii' from types (pagination params)
-                $summary_types = substr($types, 0, -2);
-                // Remove last two params (pagination)
-                $summary_params = array_slice($params, 0, -2);
-                if (!empty($summary_types)) {
-                    $summary_stmt->bind_param($summary_types, ...$summary_params);
-                }
-            }
+if (!empty($types) && count($where_conditions) > 0) {
+    // Remove the last two 'ii' from types (pagination params)
+    $summary_types = substr($types, 0, -2);
+    // Remove last two params (pagination)
+    $summary_params = array_slice($params, 0, -2);
+    if (!empty($summary_types)) {
+        $summary_stmt->bind_param($summary_types, ...$summary_params);
+    }
+}
 
-            $summary_stmt->execute();
-            $summary_result = $summary_stmt->get_result();
-            $action_summary = [];
-            while ($row = $summary_result->fetch_assoc()) {
-                $action_summary[] = $row;
-            }
-            $summary_stmt->close();
-            ?>
+$summary_stmt->execute();
+$summary_result = $summary_stmt->get_result();
+$action_summary = [];
+while ($row = $summary_result->fetch_assoc()) {
+    $action_summary[] = $row;
+}
+$summary_stmt->close();
+?>
 
             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px;">
                 <?php foreach ($action_summary as $summary): ?>

@@ -48,7 +48,9 @@
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
     text-decoration: none;
     color: inherit;
-    transition: transform 0.2s, box-shadow 0.2s;
+    transition:
+        transform 0.2s,
+        box-shadow 0.2s;
     border-left: 4px solid #667eea;
 }
 
@@ -78,4 +80,3 @@
     color: #666;
     line-height: 1.5;
 }
-

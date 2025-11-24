@@ -15,13 +15,13 @@ $error = '';
 
 // get current users full profile info from database
 $staffno = $_SESSION['staffno'];
-$sql = "SELECT d.*, s.specialisation_name, w.wardname as ward_name
+$sql = 'SELECT d.*, s.specialisation_name, w.wardname as ward_name
         FROM doctor d
         LEFT JOIN specialisation s ON d.specialisation_id = s.specialisation_id
         LEFT JOIN ward w ON d.ward_id = w.wardid
-        WHERE d.staffno = ?";
+        WHERE d.staffno = ?';
 $stmt = $conn->prepare($sql);
-$stmt->bind_param("s", $staffno);
+$stmt->bind_param('s', $staffno);
 $stmt->execute();
 $result = $stmt->get_result();
 $doctor = $result->fetch_assoc();
@@ -44,9 +44,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['change_password'])) {
         $error = 'New password must be at least 6 characters long';
     } else {
         // all validation passed, update the password
-        $update_sql = "UPDATE doctor SET password = ? WHERE staffno = ?";
+        $update_sql = 'UPDATE doctor SET password = ? WHERE staffno = ?';
         $update_stmt = $conn->prepare($update_sql);
-        $update_stmt->bind_param("ss", $new_password, $staffno);
+        $update_stmt->bind_param('ss', $new_password, $staffno);
 
         if ($update_stmt->execute()) {
             // log password change in audit trail
@@ -54,7 +54,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['change_password'])) {
                           VALUES (?, 'UPDATE', 'doctor', ?, 'password', 'Password changed', ?)";
             $audit_stmt = $conn->prepare($audit_sql);
             $ip_address = $_SERVER['REMOTE_ADDR'];
-            $audit_stmt->bind_param("sss", $staffno, $staffno, $ip_address);
+            $audit_stmt->bind_param('sss', $staffno, $staffno, $ip_address);
             $audit_stmt->execute();
             $audit_stmt->close();
 
@@ -80,9 +80,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_profile'])) {
         $error = 'First name and last name are required';
     } else {
         // Update profile
-        $update_sql = "UPDATE doctor SET firstname = ?, lastname = ? WHERE staffno = ?";
+        $update_sql = 'UPDATE doctor SET firstname = ?, lastname = ? WHERE staffno = ?';
         $update_stmt = $conn->prepare($update_sql);
-        $update_stmt->bind_param("sss", $firstname, $lastname, $staffno);
+        $update_stmt->bind_param('sss', $firstname, $lastname, $staffno);
 
         if ($update_stmt->execute()) {
             // log profile update in audit trail
@@ -90,7 +90,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_profile'])) {
                           VALUES (?, 'UPDATE', 'doctor', ?, 'Profile updated', ?)";
             $audit_stmt = $conn->prepare($audit_sql);
             $ip_address = $_SERVER['REMOTE_ADDR'];
-            $audit_stmt->bind_param("sss", $staffno, $staffno, $ip_address);
+            $audit_stmt->bind_param('sss', $staffno, $staffno, $ip_address);
             $audit_stmt->execute();
             $audit_stmt->close();
 

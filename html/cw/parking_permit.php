@@ -29,7 +29,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['request_permit'])) {
         $check_sql = "SELECT permit_id FROM parking_permit
                       WHERE doctor_id = ? AND status = 'pending'";
         $check_stmt = $conn->prepare($check_sql);
-        $check_stmt->bind_param("s", $staffno);
+        $check_stmt->bind_param('s', $staffno);
         $check_stmt->execute();
         $check_result = $check_stmt->get_result();
 
@@ -43,7 +43,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['request_permit'])) {
             $insert_sql = "INSERT INTO parking_permit (doctor_id, car_registration, permit_choice, amount, status)
                           VALUES (?, ?, ?, ?, 'pending')";
             $insert_stmt = $conn->prepare($insert_sql);
-            $insert_stmt->bind_param("sssd", $staffno, $car_registration, $permit_choice, $amount);
+            $insert_stmt->bind_param('sssd', $staffno, $car_registration, $permit_choice, $amount);
 
             if ($insert_stmt->execute()) {
                 // log this request in audit trail
@@ -53,7 +53,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['request_permit'])) {
                 $ip_address = $_SERVER['REMOTE_ADDR'];
                 $permit_id = $insert_stmt->insert_id;
                 $audit_value = "Parking permit request: $permit_choice - $car_registration";
-                $audit_stmt->bind_param("siss", $staffno, $permit_id, $audit_value, $ip_address);
+                $audit_stmt->bind_param('siss', $staffno, $permit_id, $audit_value, $ip_address);
                 $audit_stmt->execute();
                 $audit_stmt->close();
 
@@ -77,15 +77,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['cancel_request'])) {
     $verify_sql = "SELECT permit_id FROM parking_permit
                    WHERE permit_id = ? AND doctor_id = ? AND status = 'pending'";
     $verify_stmt = $conn->prepare($verify_sql);
-    $verify_stmt->bind_param("is", $permit_id, $staffno);
+    $verify_stmt->bind_param('is', $permit_id, $staffno);
     $verify_stmt->execute();
     $verify_result = $verify_stmt->get_result();
 
     if ($verify_result->num_rows > 0) {
         // ok its valid, delete the pending request
-        $delete_sql = "DELETE FROM parking_permit WHERE permit_id = ?";
+        $delete_sql = 'DELETE FROM parking_permit WHERE permit_id = ?';
         $delete_stmt = $conn->prepare($delete_sql);
-        $delete_stmt->bind_param("i", $permit_id);
+        $delete_stmt->bind_param('i', $permit_id);
 
         if ($delete_stmt->execute()) {
             // log the cancellation in audit trail
@@ -93,7 +93,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['cancel_request'])) {
                           VALUES (?, 'DELETE', 'parking_permit', ?, 'Cancelled parking permit request', ?)";
             $audit_stmt = $conn->prepare($audit_sql);
             $ip_address = $_SERVER['REMOTE_ADDR'];
-            $audit_stmt->bind_param("sis", $staffno, $permit_id, $ip_address);
+            $audit_stmt->bind_param('sis', $staffno, $permit_id, $ip_address);
             $audit_stmt->execute();
             $audit_stmt->close();
 
@@ -118,7 +118,7 @@ $permits_sql = "SELECT pp.*, d.firstname, d.lastname,
                 WHERE pp.doctor_id = ?
                 ORDER BY pp.request_date DESC";
 $permits_stmt = $conn->prepare($permits_sql);
-$permits_stmt->bind_param("s", $staffno);
+$permits_stmt->bind_param('s', $staffno);
 $permits_stmt->execute();
 $permits_result = $permits_stmt->get_result();
 $permits = $permits_result->fetch_all(MYSQLI_ASSOC);

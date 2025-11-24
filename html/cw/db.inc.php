@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Database Connection Configuration
  * QMC Hospital Management System
@@ -16,11 +17,11 @@ $conn = new mysqli($db_host, $db_user, $db_pass, $db_name);
 
 // check if connection worked, die if it didnt
 if ($conn->connect_error) {
-    die("Database connection failed: " . $conn->connect_error);
+    die('Database connection failed: ' . $conn->connect_error);
 }
 
 // set charset so we dont get weird encoding issues
-$conn->set_charset("utf8mb4");
+$conn->set_charset('utf8mb4');
 
 // turn on exceptions for better error handeling
 mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);

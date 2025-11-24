@@ -10,8 +10,8 @@ if (isset($_SESSION['staffno'])) {
                   VALUES (?, 'LOGOUT', 'doctor', ?, ?, ?)";
     $audit_stmt = $conn->prepare($audit_sql);
     $ip_address = $_SERVER['REMOTE_ADDR'];
-    $logout_info = "Logout at " . date('Y-m-d H:i:s');
-    $audit_stmt->bind_param("ssss", $_SESSION['staffno'], $_SESSION['staffno'], $logout_info, $ip_address);
+    $logout_info = 'Logout at ' . date('Y-m-d H:i:s');
+    $audit_stmt->bind_param('ssss', $_SESSION['staffno'], $_SESSION['staffno'], $logout_info, $ip_address);
     $audit_stmt->execute();
     $audit_stmt->close();
     $conn->close();

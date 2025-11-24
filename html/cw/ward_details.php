@@ -19,13 +19,13 @@ if ($ward_id === 0) {
 }
 
 // get ward information from database
-$ward_sql = "SELECT w.*, a.street, a.city, a.postcode, d.name as department_name
+$ward_sql = 'SELECT w.*, a.street, a.city, a.postcode, d.name as department_name
              FROM ward w
              LEFT JOIN address a ON w.address_id = a.address_id
              LEFT JOIN department d ON w.department_id = d.department_id
-             WHERE w.wardid = ?";
+             WHERE w.wardid = ?';
 $ward_stmt = $conn->prepare($ward_sql);
-$ward_stmt->bind_param("i", $ward_id);
+$ward_stmt->bind_param('i', $ward_id);
 $ward_stmt->execute();
 $ward_result = $ward_stmt->get_result();
 
@@ -48,7 +48,7 @@ $patients_sql = "SELECT wpa.*, p.firstname, p.lastname, p.NHSno, p.phone,
                  WHERE wpa.wardid = ? AND wpa.status = 'admitted'
                  ORDER BY wpa.date DESC";
 $patients_stmt = $conn->prepare($patients_sql);
-$patients_stmt->bind_param("i", $ward_id);
+$patients_stmt->bind_param('i', $ward_id);
 $patients_stmt->execute();
 $patients_result = $patients_stmt->get_result();
 $current_patients = [];
@@ -58,14 +58,14 @@ while ($row = $patients_result->fetch_assoc()) {
 $patients_stmt->close();
 
 // get all doctors assigned to this ward
-$doctors_sql = "SELECT d.staffno, d.firstname, d.lastname, d.consultantstatus,
+$doctors_sql = 'SELECT d.staffno, d.firstname, d.lastname, d.consultantstatus,
                 s.specialisation_name, d.username
                 FROM doctor d
                 LEFT JOIN specialisation s ON d.specialisation_id = s.specialisation_id
                 WHERE d.ward_id = ?
-                ORDER BY d.consultantstatus DESC, d.lastname";
+                ORDER BY d.consultantstatus DESC, d.lastname';
 $doctors_stmt = $conn->prepare($doctors_sql);
-$doctors_stmt->bind_param("i", $ward_id);
+$doctors_stmt->bind_param('i', $ward_id);
 $doctors_stmt->execute();
 $doctors_result = $doctors_stmt->get_result();
 $ward_doctors = [];
@@ -75,16 +75,16 @@ while ($row = $doctors_result->fetch_assoc()) {
 $doctors_stmt->close();
 
 // Get admission history (last 20)
-$history_sql = "SELECT wpa.*, p.firstname, p.lastname, p.NHSno,
+$history_sql = 'SELECT wpa.*, p.firstname, p.lastname, p.NHSno,
                 d.firstname as consultant_firstname, d.lastname as consultant_lastname
                 FROM wardpatientaddmission wpa
                 JOIN patient p ON wpa.pid = p.NHSno
                 LEFT JOIN doctor d ON wpa.consultantid = d.staffno
                 WHERE wpa.wardid = ?
                 ORDER BY wpa.date DESC, wpa.time DESC
-                LIMIT 20";
+                LIMIT 20';
 $history_stmt = $conn->prepare($history_sql);
-$history_stmt->bind_param("i", $ward_id);
+$history_stmt->bind_param('i', $ward_id);
 $history_stmt->execute();
 $history_result = $history_stmt->get_result();
 $admission_history = [];

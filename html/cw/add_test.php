@@ -22,9 +22,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['create_test'])) {
         $error = 'Test name is required';
     } else {
         // gotta check if test already exists, dont want duplicates
-        $check_sql = "SELECT testid FROM test WHERE testname = ?";
+        $check_sql = 'SELECT testid FROM test WHERE testname = ?';
         $check_stmt = $conn->prepare($check_sql);
-        $check_stmt->bind_param("s", $testname);
+        $check_stmt->bind_param('s', $testname);
         $check_stmt->execute();
         $check_result = $check_stmt->get_result();
 
@@ -32,9 +32,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['create_test'])) {
             $error = 'A test with this name already exists';
         } else {
             // ok test doesnt exist, lets add it to database
-            $insert_sql = "INSERT INTO test (testname) VALUES (?)";
+            $insert_sql = 'INSERT INTO test (testname) VALUES (?)';
             $insert_stmt = $conn->prepare($insert_sql);
-            $insert_stmt->bind_param("s", $testname);
+            $insert_stmt->bind_param('s', $testname);
 
             if ($insert_stmt->execute()) {
                 $new_test_id = $insert_stmt->insert_id;
@@ -46,7 +46,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['create_test'])) {
                 $audit_stmt = $conn->prepare($audit_sql);
                 $ip_address = $_SERVER['REMOTE_ADDR'];
                 $audit_value = "Created test: $testname";
-                $audit_stmt->bind_param("ssss", $_SESSION['staffno'], $new_test_id, $audit_value, $ip_address);
+                $audit_stmt->bind_param('ssss', $_SESSION['staffno'], $new_test_id, $audit_value, $ip_address);
                 $audit_stmt->execute();
                 $audit_stmt->close();
             } else {
@@ -77,9 +77,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_patient'])) {
         $error = 'NHS Number, First Name, Phone, and Age are required';
     } else {
         // check if patient already in system, NHS number should be unique
-        $check_sql = "SELECT NHSno FROM patient WHERE NHSno = ?";
+        $check_sql = 'SELECT NHSno FROM patient WHERE NHSno = ?';
         $check_stmt = $conn->prepare($check_sql);
-        $check_stmt->bind_param("s", $nhs_no);
+        $check_stmt->bind_param('s', $nhs_no);
         $check_stmt->execute();
         $check_result = $check_stmt->get_result();
 
@@ -87,20 +87,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_patient'])) {
             $error = "Patient with NHS Number $nhs_no already exists in the system";
         } else {
             // need to insert address first cuz patient table references it
-            $address_sql = "INSERT INTO address (street, city, postcode) VALUES (?, ?, ?)";
+            $address_sql = 'INSERT INTO address (street, city, postcode) VALUES (?, ?, ?)';
             $address_stmt = $conn->prepare($address_sql);
-            $address_stmt->bind_param("sss", $street, $city, $postcode);
+            $address_stmt->bind_param('sss', $street, $city, $postcode);
             $address_stmt->execute();
             $address_id = $address_stmt->insert_id;
             $address_stmt->close();
 
             // now insert the patient record with the address id
-            $patient_sql = "INSERT INTO patient (NHSno, firstname, lastname, phone, address_id, age, gender_id, emergencyphone)
-                           VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+            $patient_sql = 'INSERT INTO patient (NHSno, firstname, lastname, phone, address_id, age, gender_id, emergencyphone)
+                           VALUES (?, ?, ?, ?, ?, ?, ?, ?)';
             $patient_stmt = $conn->prepare($patient_sql);
             $gender_id_null = $gender_id > 0 ? $gender_id : null;
             $emergency_null = !empty($emergencyphone) ? $emergencyphone : null;
-            $patient_stmt->bind_param("ssssiiss", $nhs_no, $firstname, $lastname, $phone, $address_id, $age, $gender_id_null, $emergency_null);
+            $patient_stmt->bind_param('ssssiiss', $nhs_no, $firstname, $lastname, $phone, $address_id, $age, $gender_id_null, $emergency_null);
 
             if ($patient_stmt->execute()) {
                 $success = "Patient '$firstname $lastname' (NHS: $nhs_no) added successfully!";
@@ -111,7 +111,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_patient'])) {
                 $audit_stmt = $conn->prepare($audit_sql);
                 $ip_address = $_SERVER['REMOTE_ADDR'];
                 $audit_value = "Added patient: $firstname $lastname";
-                $audit_stmt->bind_param("ssss", $_SESSION['staffno'], $nhs_no, $audit_value, $ip_address);
+                $audit_stmt->bind_param('ssss', $_SESSION['staffno'], $nhs_no, $audit_value, $ip_address);
                 $audit_stmt->execute();
                 $audit_stmt->close();
             } else {
@@ -134,9 +134,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['prescribe_test'])) {
         $error = 'Please select both a patient and a test';
     } else {
         // verify patient actually exists before prescribing anything
-        $check_patient_sql = "SELECT NHSno, firstname, lastname FROM patient WHERE NHSno = ?";
+        $check_patient_sql = 'SELECT NHSno, firstname, lastname FROM patient WHERE NHSno = ?';
         $check_patient_stmt = $conn->prepare($check_patient_sql);
-        $check_patient_stmt->bind_param("s", $patient_nhs);
+        $check_patient_stmt->bind_param('s', $patient_nhs);
         $check_patient_stmt->execute();
         $patient_result = $check_patient_stmt->get_result();
 
@@ -148,15 +148,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['prescribe_test'])) {
 
 
             // ok patient exists, lets prescribe the test
-            $prescribe_sql = "INSERT INTO patient_test (pid, testid, date, doctorid) VALUES (?, ?, ?, ?)";
+            $prescribe_sql = 'INSERT INTO patient_test (pid, testid, date, doctorid) VALUES (?, ?, ?, ?)';
             $prescribe_stmt = $conn->prepare($prescribe_sql);
-            $prescribe_stmt->bind_param("siss", $patient_nhs, $test_id, $test_date, $_SESSION['staffno']);
+            $prescribe_stmt->bind_param('siss', $patient_nhs, $test_id, $test_date, $_SESSION['staffno']);
 
             if ($prescribe_stmt->execute()) {
                 // need to get test name for the success mesage
-                $test_name_sql = "SELECT testname FROM test WHERE testid = ?";
+                $test_name_sql = 'SELECT testname FROM test WHERE testid = ?';
                 $test_name_stmt = $conn->prepare($test_name_sql);
-                $test_name_stmt->bind_param("i", $test_id);
+                $test_name_stmt->bind_param('i', $test_id);
                 $test_name_stmt->execute();
                 $test_name_result = $test_name_stmt->get_result();
                 $test_name = $test_name_result->fetch_assoc()['testname'];
@@ -170,7 +170,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['prescribe_test'])) {
                 $audit_stmt = $conn->prepare($audit_sql);
                 $ip_address = $_SERVER['REMOTE_ADDR'];
                 $audit_value = "Prescribed test $test_id to patient $patient_nhs";
-                $audit_stmt->bind_param("ssss", $_SESSION['staffno'], $patient_nhs, $audit_value, $ip_address);
+                $audit_stmt->bind_param('ssss', $_SESSION['staffno'], $patient_nhs, $audit_value, $ip_address);
                 $audit_stmt->execute();
                 $audit_stmt->close();
             } else {
@@ -183,12 +183,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['prescribe_test'])) {
 }
 
 // fetch all tests from database for the dropdown menu
-$tests_sql = "SELECT testid, testname FROM test ORDER BY testname";
+$tests_sql = 'SELECT testid, testname FROM test ORDER BY testname';
 $tests_result = $conn->query($tests_sql);
 $all_tests = $tests_result->fetch_all(MYSQLI_ASSOC);
 
 // get gender options for patient form
-$genders_sql = "SELECT gender_id, gender_name FROM gender ORDER BY gender_name";
+$genders_sql = 'SELECT gender_id, gender_name FROM gender ORDER BY gender_name';
 $genders_result = $conn->query($genders_sql);
 $all_genders = $genders_result->fetch_all(MYSQLI_ASSOC);
 

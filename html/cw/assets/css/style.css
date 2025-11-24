@@ -4,7 +4,6 @@
  * COMP4039 Coursework
  */
 
-
 /* reset all margins and padding, makes everything consistent */
 * {
     margin: 0;
@@ -18,7 +17,6 @@ body {
     background: #f5f6fa;
     color: #333;
 }
-
 
 /* navbar with gradient background, looks pretty nice */
 .navbar {
@@ -73,7 +71,6 @@ body {
     background: rgba(255, 255, 255, 0.3);
 }
 
-
 /* main container for page content, centered */
 .container {
     max-width: 1200px;
@@ -104,7 +101,6 @@ body {
     color: #666;
     font-size: 14px;
 }
-
 
 /* form group spacing */
 .form-group {
@@ -147,7 +143,6 @@ body {
     min-height: 100px;
 }
 
-
 /* base button styling with nice transitions */
 .btn {
     padding: 12px 24px;
@@ -156,7 +151,9 @@ body {
     font-size: 14px;
     font-weight: 600;
     cursor: pointer;
-    transition: transform 0.2s, box-shadow 0.2s;
+    transition:
+        transform 0.2s,
+        box-shadow 0.2s;
     text-decoration: none;
     display: inline-block;
 }
@@ -218,7 +215,6 @@ body {
     width: 100%;
 }
 
-
 /* alert box styling */
 .alert {
     padding: 12px 15px;
@@ -254,7 +250,6 @@ body {
     color: #856404;
     border-left: 4px solid #ffc107;
 }
-
 
 /* table container for horizontal scrolling on small screens */
 .table-container {
@@ -295,7 +290,6 @@ table tr:hover {
     background: #f8f9fa;
 }
 
-
 /* badge component for status indicators */
 .badge {
     display: inline-block;
@@ -335,7 +329,6 @@ table tr:hover {
     color: white;
 }
 
-
 /* grid layout system for responsive columns */
 .grid {
     display: grid;
@@ -357,7 +350,6 @@ table tr:hover {
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
 }
 
-
 /* text alignment utilities */
 .text-center {
     text-align: center;
@@ -368,20 +360,37 @@ table tr:hover {
 }
 
 /* margin top utilities */
-.mt-1 { margin-top: 10px; }
-.mt-2 { margin-top: 20px; }
-.mt-3 { margin-top: 30px; }
+.mt-1 {
+    margin-top: 10px;
+}
+.mt-2 {
+    margin-top: 20px;
+}
+.mt-3 {
+    margin-top: 30px;
+}
 
 /* margin bottom utilities */
-.mb-1 { margin-bottom: 10px; }
-.mb-2 { margin-bottom: 20px; }
-.mb-3 { margin-bottom: 30px; }
+.mb-1 {
+    margin-bottom: 10px;
+}
+.mb-2 {
+    margin-bottom: 20px;
+}
+.mb-3 {
+    margin-bottom: 30px;
+}
 
 /* padding utilities */
-.p-1 { padding: 10px; }
-.p-2 { padding: 20px; }
-.p-3 { padding: 30px; }
-
+.p-1 {
+    padding: 10px;
+}
+.p-2 {
+    padding: 20px;
+}
+.p-3 {
+    padding: 30px;
+}
 
 /* page header with bottom border */
 .page-header {
@@ -402,7 +411,6 @@ table tr:hover {
     margin: 0;
 }
 
-
 /* stats grid for dashboard statistics */
 .stats-grid {
     display: grid;
@@ -418,7 +426,9 @@ table tr:hover {
     border-radius: 8px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     text-align: center;
-    transition: transform 0.2s, box-shadow 0.2s;
+    transition:
+        transform 0.2s,
+        box-shadow 0.2s;
 }
 
 /* stat card lifts on hover */

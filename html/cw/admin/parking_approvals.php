@@ -11,9 +11,9 @@ require_once '../db.inc.php';
 
 // check if user is admin by querying database
 $staffno = $_SESSION['staffno'];
-$admin_check_sql = "SELECT is_admin FROM doctor WHERE staffno = ?";
+$admin_check_sql = 'SELECT is_admin FROM doctor WHERE staffno = ?';
 $admin_check_stmt = $conn->prepare($admin_check_sql);
-$admin_check_stmt->bind_param("s", $staffno);
+$admin_check_stmt->bind_param('s', $staffno);
 $admin_check_stmt->execute();
 $admin_result = $admin_check_stmt->get_result();
 $admin_data = $admin_result->fetch_assoc();
@@ -37,9 +37,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['approve_permit'])) {
 
     if ($permit_id > 0 && !empty($permit_number)) {
         // make sure permit number isnt already in use
-        $check_permit_sql = "SELECT permit_id FROM parking_permit WHERE permit_number = ?";
+        $check_permit_sql = 'SELECT permit_id FROM parking_permit WHERE permit_number = ?';
         $check_permit_stmt = $conn->prepare($check_permit_sql);
-        $check_permit_stmt->bind_param("s", $permit_number);
+        $check_permit_stmt->bind_param('s', $permit_number);
         $check_permit_stmt->execute();
         $check_permit_result = $check_permit_stmt->get_result();
 
@@ -49,7 +49,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['approve_permit'])) {
             // get permit details to check if its pending
             $permit_sql = "SELECT permit_choice FROM parking_permit WHERE permit_id = ? AND status = 'pending'";
             $permit_stmt = $conn->prepare($permit_sql);
-            $permit_stmt->bind_param("i", $permit_id);
+            $permit_stmt->bind_param('i', $permit_id);
             $permit_stmt->execute();
             $permit_result = $permit_stmt->get_result();
 
@@ -72,7 +72,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['approve_permit'])) {
                                   permit_number = ?
                               WHERE permit_id = ?";
                 $update_stmt = $conn->prepare($update_sql);
-                $update_stmt->bind_param("ssssi", $staffno, $activation_date, $end_date, $permit_number, $permit_id);
+                $update_stmt->bind_param('ssssi', $staffno, $activation_date, $end_date, $permit_number, $permit_id);
 
                 if ($update_stmt->execute()) {
                     $success = "Parking permit #$permit_number approved successfully!";
@@ -83,7 +83,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['approve_permit'])) {
                     $audit_stmt = $conn->prepare($audit_sql);
                     $ip_address = $_SERVER['REMOTE_ADDR'];
                     $audit_value = "Approved parking permit #$permit_number";
-                    $audit_stmt->bind_param("siss", $staffno, $permit_id, $audit_value, $ip_address);
+                    $audit_stmt->bind_param('siss', $staffno, $permit_id, $audit_value, $ip_address);
                     $audit_stmt->execute();
                     $audit_stmt->close();
                 } else {
@@ -114,11 +114,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['reject_permit'])) {
                           rejection_reason = ?
                       WHERE permit_id = ? AND status = 'pending'";
         $update_stmt = $conn->prepare($update_sql);
-        $update_stmt->bind_param("ssi", $staffno, $rejection_reason, $permit_id);
+        $update_stmt->bind_param('ssi', $staffno, $rejection_reason, $permit_id);
 
         if ($update_stmt->execute()) {
             if ($update_stmt->affected_rows > 0) {
-                $success = "Parking permit request rejected";
+                $success = 'Parking permit request rejected';
 
                 // Audit log
                 $audit_sql = "INSERT INTO audit_log (user_id, action, table_name, record_id, new_value, ip_address)
@@ -126,7 +126,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['reject_permit'])) {
                 $audit_stmt = $conn->prepare($audit_sql);
                 $ip_address = $_SERVER['REMOTE_ADDR'];
                 $audit_value = "Rejected parking permit: $rejection_reason";
-                $audit_stmt->bind_param("siss", $staffno, $permit_id, $audit_value, $ip_address);
+                $audit_stmt->bind_param('siss', $staffno, $permit_id, $audit_value, $ip_address);
                 $audit_stmt->execute();
                 $audit_stmt->close();
             } else {
@@ -299,7 +299,7 @@ require_once '../includes/navbar.php';
                                     } else {
                                         echo 'N/A';
                                     }
-                                    ?>
+                            ?>
                                 </td>
                                 <td>
                                     <?php if ($permit['status'] === 'approved'): ?>

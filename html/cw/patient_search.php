@@ -33,7 +33,7 @@ if (!empty($search_term)) {
 
     $count_stmt = $conn->prepare($count_sql);
     $search_pattern = "%$search_term%";
-    $count_stmt->bind_param("ssss", $search_pattern, $search_pattern, $search_pattern, $search_pattern);
+    $count_stmt->bind_param('ssss', $search_pattern, $search_pattern, $search_pattern, $search_pattern);
     $count_stmt->execute();
     $count_result = $count_stmt->get_result();
     $total_patients = $count_result->fetch_assoc()['total'];
@@ -51,7 +51,7 @@ if (!empty($search_term)) {
                      LIMIT ? OFFSET ?";
 
     $patients_stmt = $conn->prepare($patients_sql);
-    $patients_stmt->bind_param("ssssii", $search_pattern, $search_pattern, $search_pattern, $search_pattern, $per_page, $offset);
+    $patients_stmt->bind_param('ssssii', $search_pattern, $search_pattern, $search_pattern, $search_pattern, $per_page, $offset);
     $patients_stmt->execute();
     $patients_result = $patients_stmt->get_result();
     $patients = $patients_result->fetch_all(MYSQLI_ASSOC);
@@ -63,24 +63,24 @@ if (!empty($search_term)) {
     $audit_stmt = $conn->prepare($audit_sql);
     $ip_address = $_SERVER['REMOTE_ADDR'];
     $audit_value = "Patient search: $search_term";
-    $audit_stmt->bind_param("sss", $_SESSION['staffno'], $audit_value, $ip_address);
+    $audit_stmt->bind_param('sss', $_SESSION['staffno'], $audit_value, $ip_address);
     $audit_stmt->execute();
     $audit_stmt->close();
 } else {
     // no search term, just show all patients with pagination
-    $count_sql = "SELECT COUNT(*) as total FROM patient";
+    $count_sql = 'SELECT COUNT(*) as total FROM patient';
     $count_result = $conn->query($count_sql);
     $total_patients = $count_result->fetch_assoc()['total'];
 
     // get patients for current page
-    $patients_sql = "SELECT p.*, g.gender_name
+    $patients_sql = 'SELECT p.*, g.gender_name
                      FROM patient p
                      LEFT JOIN gender g ON p.gender_id = g.gender_id
                      ORDER BY p.lastname, p.firstname
-                     LIMIT ? OFFSET ?";
+                     LIMIT ? OFFSET ?';
 
     $patients_stmt = $conn->prepare($patients_sql);
-    $patients_stmt->bind_param("ii", $per_page, $offset);
+    $patients_stmt->bind_param('ii', $per_page, $offset);
     $patients_stmt->execute();
     $patients_result = $patients_stmt->get_result();
     $patients = $patients_result->fetch_all(MYSQLI_ASSOC);

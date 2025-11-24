@@ -25,14 +25,14 @@ if (empty($nhs_no)) {
 }
 
 // fetch patient info from database
-$patient_sql = "SELECT p.*, g.gender_name, a.street, a.city, a.postcode
+$patient_sql = 'SELECT p.*, g.gender_name, a.street, a.city, a.postcode
                 FROM patient p
                 LEFT JOIN gender g ON p.gender_id = g.gender_id
                 LEFT JOIN address a ON p.address_id = a.address_id
-                WHERE p.NHSno = ?";
+                WHERE p.NHSno = ?';
 
 $patient_stmt = $conn->prepare($patient_sql);
-$patient_stmt->bind_param("s", $nhs_no);
+$patient_stmt->bind_param('s', $nhs_no);
 $patient_stmt->execute();
 $patient_result = $patient_stmt->get_result();
 
@@ -43,33 +43,33 @@ if ($patient_result->num_rows === 0) {
     $patient = $patient_result->fetch_assoc();
 
     // get all ward admissions for this patient
-    $ward_sql = "SELECT w.*, wa.wardname, wa.phone as ward_phone,
+    $ward_sql = 'SELECT w.*, wa.wardname, wa.phone as ward_phone,
                  d.firstname as consultant_firstname, d.lastname as consultant_lastname,
                  DATEDIFF(CURDATE(), w.date) as days_admitted
                  FROM wardpatientaddmission w
                  JOIN ward wa ON w.wardid = wa.wardid
                  LEFT JOIN doctor d ON w.consultantid = d.staffno
                  WHERE w.pid = ?
-                 ORDER BY w.date DESC";
+                 ORDER BY w.date DESC';
 
     $ward_stmt = $conn->prepare($ward_sql);
-    $ward_stmt->bind_param("s", $nhs_no);
+    $ward_stmt->bind_param('s', $nhs_no);
     $ward_stmt->execute();
     $ward_result = $ward_stmt->get_result();
     $ward_admissions = $ward_result->fetch_all(MYSQLI_ASSOC);
     $ward_stmt->close();
 
     // get all tests prescribed to this patient
-    $test_sql = "SELECT pt.*, t.testname,
+    $test_sql = 'SELECT pt.*, t.testname,
                  d.firstname as doctor_firstname, d.lastname as doctor_lastname
                  FROM patient_test pt
                  JOIN test t ON pt.testid = t.testid
                  LEFT JOIN doctor d ON pt.doctorid = d.staffno
                  WHERE pt.pid = ?
-                 ORDER BY pt.date DESC";
+                 ORDER BY pt.date DESC';
 
     $test_stmt = $conn->prepare($test_sql);
-    $test_stmt->bind_param("s", $nhs_no);
+    $test_stmt->bind_param('s', $nhs_no);
     $test_stmt->execute();
     $test_result = $test_stmt->get_result();
     $tests = $test_result->fetch_all(MYSQLI_ASSOC);
@@ -80,8 +80,8 @@ if ($patient_result->num_rows === 0) {
                   VALUES (?, 'SELECT', 'patient', ?, ?, ?)";
     $audit_stmt = $conn->prepare($audit_sql);
     $ip_address = $_SERVER['REMOTE_ADDR'];
-    $audit_value = "Viewed patient details";
-    $audit_stmt->bind_param("ssss", $_SESSION['staffno'], $nhs_no, $audit_value, $ip_address);
+    $audit_value = 'Viewed patient details';
+    $audit_stmt->bind_param('ssss', $_SESSION['staffno'], $nhs_no, $audit_value, $ip_address);
     $audit_stmt->execute();
     $audit_stmt->close();
 }
@@ -158,7 +158,7 @@ require_once 'includes/navbar.php';
                                 } else {
                                     echo 'N/A';
                                 }
-                                ?>
+        ?>
                             </td>
                         </tr>
                     </table>
@@ -190,12 +190,12 @@ require_once 'includes/navbar.php';
                                 <td><?php echo $admission['time'] ? date('H:i', strtotime($admission['time'])) : 'N/A'; ?></td>
                                 <td>
                                     <?php
-                                    if ($admission['status'] === 'admitted') {
-                                        echo $admission['days_admitted'] . ' days (ongoing)';
-                                    } else {
-                                        echo 'Discharged';
-                                    }
-                                    ?>
+            if ($admission['status'] === 'admitted') {
+                echo $admission['days_admitted'] . ' days (ongoing)';
+            } else {
+                echo 'Discharged';
+            }
+                            ?>
                                 </td>
                                 <td>
                                     <?php if ($admission['status'] === 'admitted'): ?>
@@ -240,12 +240,12 @@ require_once 'includes/navbar.php';
                                 <td><?php echo date('d/m/Y', strtotime($test['date'])); ?></td>
                                 <td>
                                     <?php
-                                    if ($test['doctor_firstname']) {
-                                        echo 'Dr. ' . htmlspecialchars($test['doctor_firstname'] . ' ' . $test['doctor_lastname']);
-                                    } else {
-                                        echo 'N/A';
-                                    }
-                                    ?>
+                            if ($test['doctor_firstname']) {
+                                echo 'Dr. ' . htmlspecialchars($test['doctor_firstname'] . ' ' . $test['doctor_lastname']);
+                            } else {
+                                echo 'N/A';
+                            }
+                            ?>
                                 </td>
                                 <td><?php echo htmlspecialchars($test['report'] ?? 'Pending'); ?></td>
                             </tr>
@@ -273,13 +273,13 @@ require_once 'includes/navbar.php';
                     <div class="stat-value">
                         <?php
                         $currently_admitted = 0;
-                        foreach ($ward_admissions as $admission) {
-                            if ($admission['status'] === 'admitted') {
-                                $currently_admitted++;
-                            }
-                        }
-                        echo $currently_admitted;
-                        ?>
+        foreach ($ward_admissions as $admission) {
+            if ($admission['status'] === 'admitted') {
+                $currently_admitted++;
+            }
+        }
+        echo $currently_admitted;
+        ?>
                     </div>
                 </div>
                 <div class="stat-card">
