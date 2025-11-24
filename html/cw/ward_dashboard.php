@@ -26,6 +26,7 @@ $wards_sql = "SELECT w.wardid, w.wardname, w.phone, w.noofbeds,
               ORDER BY w.wardname";
 $wards_result = $conn->query($wards_sql);
 $wards = [];
+
 while ($row = $wards_result->fetch_assoc()) {
     $wards[] = $row;
 }
@@ -93,9 +94,9 @@ require_once 'includes/navbar.php';
             <h2>🏥 All Wards</h2>
         </div>
         <div class="card-body">
-            <?php if (count($wards) > 0): ?>
+            <?php if (count($wards) > 0) { ?>
                 <div class="wards-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 20px;">
-                    <?php foreach ($wards as $ward): ?>
+                    <?php foreach ($wards as $ward) { ?>
                         <?php
                         $ward_occupancy = ($ward['noofbeds'] ?? 0) > 0 ? round(($ward['current_patients'] / $ward['noofbeds']) * 100, 1) : 0;
                         $available_beds = ($ward['noofbeds'] ?? 0) - $ward['current_patients'];
@@ -150,13 +151,13 @@ require_once 'includes/navbar.php';
                                 View Details →
                             </a>
                         </div>
-                    <?php endforeach; ?>
+                    <?php } ?>
                 </div>
-            <?php else: ?>
+            <?php } else { ?>
                 <div class="info-message">
                     <p>ℹ️ No wards found in the system.</p>
                 </div>
-            <?php endif; ?>
+            <?php } ?>
         </div>
     </div>
 

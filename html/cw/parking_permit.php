@@ -144,13 +144,13 @@ require_once 'includes/navbar.php';
 
 
 
-    <?php if ($success): ?>
+    <?php if ($success) { ?>
         <div class="alert alert-success"><?php echo htmlspecialchars($success); ?></div>
-    <?php endif; ?>
+    <?php } ?>
 
-    <?php if ($error): ?>
+    <?php if ($error) { ?>
         <div class="alert alert-error"><?php echo htmlspecialchars($error); ?></div>
-    <?php endif; ?>
+    <?php } ?>
 
     <div class="grid grid-2">
         <!-- Request New Permit -->
@@ -222,7 +222,7 @@ require_once 'includes/navbar.php';
     <div class="card mt-3">
         <h2>My Parking Permit Requests</h2>
 
-        <?php if (count($permits) > 0): ?>
+        <?php if (count($permits) > 0) { ?>
             <table>
                 <thead>
                     <tr>
@@ -238,20 +238,20 @@ require_once 'includes/navbar.php';
                     </tr>
                 </thead>
                 <tbody>
-                    <?php foreach ($permits as $permit): ?>
+                    <?php foreach ($permits as $permit) { ?>
                         <tr>
                             <td><?php echo date('d/m/Y H:i', strtotime($permit['request_date'])); ?></td>
                             <td><strong><?php echo htmlspecialchars($permit['car_registration']); ?></strong></td>
                             <td><?php echo ucfirst($permit['permit_choice']); ?></td>
                             <td>£<?php echo number_format($permit['amount'], 2); ?></td>
                             <td>
-                                <?php if ($permit['status'] === 'pending'): ?>
+                                <?php if ($permit['status'] === 'pending') { ?>
                                     <span class="badge badge-warning">Pending</span>
-                                <?php elseif ($permit['status'] === 'approved'): ?>
+                                <?php } elseif ($permit['status'] === 'approved') { ?>
                                     <span class="badge badge-success">Approved</span>
-                                <?php else: ?>
+                                <?php } else { ?>
                                     <span class="badge badge-danger">Rejected</span>
-                                <?php endif; ?>
+                                <?php } ?>
                             </td>
                             <td>
                                 <?php echo $permit['activation_date'] ? date('d/m/Y', strtotime($permit['activation_date'])) : 'N/A'; ?>
@@ -263,7 +263,7 @@ require_once 'includes/navbar.php';
                                 <?php echo $permit['permit_number'] ? htmlspecialchars($permit['permit_number']) : 'N/A'; ?>
                             </td>
                             <td>
-                                <?php if ($permit['status'] === 'pending'): ?>
+                                <?php if ($permit['status'] === 'pending') { ?>
                                     <form method="POST" action="" style="display: inline;"
                                           onsubmit="return confirm('Are you sure you want to cancel this request?');">
                                         <input type="hidden" name="permit_id" value="<?php echo $permit['permit_id']; ?>">
@@ -272,25 +272,25 @@ require_once 'includes/navbar.php';
                                             Cancel
                                         </button>
                                     </form>
-                                <?php elseif ($permit['status'] === 'rejected'): ?>
+                                <?php } elseif ($permit['status'] === 'rejected') { ?>
                                     <button type="button" class="btn btn-secondary"
                                             style="padding: 5px 10px; font-size: 12px;"
                                             onclick="alert('Rejection Reason: <?php echo htmlspecialchars($permit['rejection_reason'] ?? 'No reason provided'); ?>')">
                                         View Reason
                                     </button>
-                                <?php else: ?>
+                                <?php } else { ?>
                                     <span style="color: #28a745;">✓ Active</span>
-                                <?php endif; ?>
+                                <?php } ?>
                             </td>
                         </tr>
-                    <?php endforeach; ?>
+                    <?php } ?>
                 </tbody>
             </table>
-        <?php else: ?>
+        <?php } else { ?>
             <div class="alert alert-info">
                 You have not submitted any parking permit requests yet.
             </div>
-        <?php endif; ?>
+        <?php } ?>
     </div>
 
     <div class="text-center mt-3">

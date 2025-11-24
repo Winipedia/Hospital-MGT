@@ -93,11 +93,11 @@ require_once 'includes/header.php';
         <div class="login-body">
             <h2 style="margin-bottom: 20px; color: #333; font-size: 20px;">Doctor Login</h2>
 
-            <?php if ($error): ?>
+            <?php if ($error) { ?>
                 <div class="error-message">
                     ⚠️ <?php echo htmlspecialchars($error); ?>
                 </div>
-            <?php endif; ?>
+            <?php } ?>
 
             <form method="POST" action="index.php">
                 <div class="form-group">

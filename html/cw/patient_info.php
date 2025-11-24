@@ -100,12 +100,12 @@ require_once 'includes/navbar.php';
 ?>
 
 <div class="container">
-    <?php if ($error): ?>
+    <?php if ($error) { ?>
         <div class="alert alert-error"><?php echo htmlspecialchars($error); ?></div>
         <div class="text-center mt-3">
             <a href="patient_search.php" class="btn btn-secondary">← Back to Patient Search</a>
         </div>
-    <?php else: ?>
+    <?php } else { ?>
         <div class="card">
             <h1>👤 Patient Information</h1>
             <p>Detailed information for <?php echo htmlspecialchars($patient['firstname'] . ' ' . $patient['lastname']); ?></p>
@@ -169,7 +169,7 @@ require_once 'includes/navbar.php';
         <!-- Ward Admissions -->
         <div class="card">
             <h2>Ward Admission History</h2>
-            <?php if (count($ward_admissions) > 0): ?>
+            <?php if (count($ward_admissions) > 0) { ?>
                 <table>
                     <thead>
                         <tr>
@@ -183,7 +183,7 @@ require_once 'includes/navbar.php';
                         </tr>
                     </thead>
                     <tbody>
-                        <?php foreach ($ward_admissions as $admission): ?>
+                        <?php foreach ($ward_admissions as $admission) { ?>
                             <tr>
                                 <td><strong><?php echo htmlspecialchars($admission['wardname']); ?></strong></td>
                                 <td><?php echo date('d/m/Y', strtotime($admission['date'])); ?></td>
@@ -198,32 +198,32 @@ require_once 'includes/navbar.php';
                             ?>
                                 </td>
                                 <td>
-                                    <?php if ($admission['status'] === 'admitted'): ?>
+                                    <?php if ($admission['status'] === 'admitted') { ?>
                                         <span class="badge badge-success">Admitted</span>
-                                    <?php else: ?>
+                                    <?php } else { ?>
                                         <span class="badge badge-info">Discharged</span>
-                                    <?php endif; ?>
+                                    <?php } ?>
                                 </td>
                                 <td>
                                     Dr. <?php echo htmlspecialchars($admission['consultant_firstname'] . ' ' . $admission['consultant_lastname']); ?>
                                 </td>
                                 <td><?php echo htmlspecialchars($admission['ward_phone']); ?></td>
                             </tr>
-                        <?php endforeach; ?>
+                        <?php } ?>
                     </tbody>
                 </table>
-            <?php else: ?>
+            <?php } else { ?>
                 <div class="alert alert-info">
                     <strong>No ward admissions found.</strong><br>
                     This patient has not been admitted to any ward.
                 </div>
-            <?php endif; ?>
+            <?php } ?>
         </div>
 
         <!-- Tests Performed -->
         <div class="card">
             <h2>Tests Performed</h2>
-            <?php if (count($tests) > 0): ?>
+            <?php if (count($tests) > 0) { ?>
                 <table>
                     <thead>
                         <tr>
@@ -234,7 +234,7 @@ require_once 'includes/navbar.php';
                         </tr>
                     </thead>
                     <tbody>
-                        <?php foreach ($tests as $test): ?>
+                        <?php foreach ($tests as $test) { ?>
                             <tr>
                                 <td><strong><?php echo htmlspecialchars($test['testname']); ?></strong></td>
                                 <td><?php echo date('d/m/Y', strtotime($test['date'])); ?></td>
@@ -249,15 +249,15 @@ require_once 'includes/navbar.php';
                                 </td>
                                 <td><?php echo htmlspecialchars($test['report'] ?? 'Pending'); ?></td>
                             </tr>
-                        <?php endforeach; ?>
+                        <?php } ?>
                     </tbody>
                 </table>
-            <?php else: ?>
+            <?php } else { ?>
                 <div class="alert alert-info">
                     <strong>No tests found.</strong><br>
                     No tests have been performed for this patient.
                 </div>
-            <?php endif; ?>
+            <?php } ?>
         </div>
 
         <!-- Summary Statistics -->
@@ -273,6 +273,7 @@ require_once 'includes/navbar.php';
                     <div class="stat-value">
                         <?php
                         $currently_admitted = 0;
+
         foreach ($ward_admissions as $admission) {
             if ($admission['status'] === 'admitted') {
                 $currently_admitted++;
@@ -292,7 +293,7 @@ require_once 'includes/navbar.php';
         <div class="text-center mt-3">
             <a href="patient_search.php" class="btn btn-secondary">← Back to Patient Search</a>
         </div>
-    <?php endif; ?>
+    <?php } ?>
 </div>
 
 <?php

@@ -187,19 +187,19 @@ require_once '../includes/navbar.php';
         <span class="badge badge-info" style="font-size: 14px;">Admin Panel</span>
     </div>
 
-    <?php if ($success): ?>
+    <?php if ($success) { ?>
         <div class="alert alert-success"><?php echo htmlspecialchars($success); ?></div>
-    <?php endif; ?>
+    <?php } ?>
 
-    <?php if ($error): ?>
+    <?php if ($error) { ?>
         <div class="alert alert-error"><?php echo htmlspecialchars($error); ?></div>
-    <?php endif; ?>
+    <?php } ?>
 
     <!-- Pending Requests -->
     <div class="card">
         <h2>⏳ Pending Requests (<?php echo count($pending_permits); ?>)</h2>
 
-        <?php if (count($pending_permits) > 0): ?>
+        <?php if (count($pending_permits) > 0) { ?>
             <div style="overflow-x: auto;">
                 <table>
                     <thead>
@@ -215,7 +215,7 @@ require_once '../includes/navbar.php';
                         </tr>
                     </thead>
                     <tbody>
-                        <?php foreach ($pending_permits as $permit): ?>
+                        <?php foreach ($pending_permits as $permit) { ?>
                             <tr>
                                 <td><?php echo date('d/m/Y H:i', strtotime($permit['request_date'])); ?></td>
                                 <td><strong><?php echo htmlspecialchars($permit['firstname'] . ' ' . $permit['lastname']); ?></strong></td>
@@ -246,23 +246,23 @@ require_once '../includes/navbar.php';
                                     </div>
                                 </td>
                             </tr>
-                        <?php endforeach; ?>
+                        <?php } ?>
                     </tbody>
                 </table>
             </div>
-        <?php else: ?>
+        <?php } else { ?>
             <div class="alert alert-info">
                 <strong>No pending requests</strong><br>
                 All parking permit requests have been processed.
             </div>
-        <?php endif; ?>
+        <?php } ?>
     </div>
 
     <!-- Recently Processed -->
     <div class="card">
         <h2>📋 Recently Processed (Last 10)</h2>
 
-        <?php if (count($processed_permits) > 0): ?>
+        <?php if (count($processed_permits) > 0) { ?>
             <div style="overflow-x: auto;">
                 <table>
                     <thead>
@@ -278,7 +278,7 @@ require_once '../includes/navbar.php';
                         </tr>
                     </thead>
                     <tbody>
-                        <?php foreach ($processed_permits as $permit): ?>
+                        <?php foreach ($processed_permits as $permit) { ?>
                             <tr>
                                 <td><?php echo date('d/m/Y H:i', strtotime($permit['request_date'])); ?></td>
                                 <td><?php echo htmlspecialchars($permit['firstname'] . ' ' . $permit['lastname']); ?></td>
@@ -286,11 +286,11 @@ require_once '../includes/navbar.php';
                                 <td><?php echo ucfirst($permit['permit_choice']); ?></td>
                                 <td>£<?php echo number_format($permit['amount'], 2); ?></td>
                                 <td>
-                                    <?php if ($permit['status'] === 'approved'): ?>
+                                    <?php if ($permit['status'] === 'approved') { ?>
                                         <span class="badge badge-success">Approved</span>
-                                    <?php else: ?>
+                                    <?php } else { ?>
                                         <span class="badge badge-danger">Rejected</span>
-                                    <?php endif; ?>
+                                    <?php } ?>
                                 </td>
                                 <td>
                                     <?php
@@ -302,32 +302,32 @@ require_once '../includes/navbar.php';
                             ?>
                                 </td>
                                 <td>
-                                    <?php if ($permit['status'] === 'approved'): ?>
+                                    <?php if ($permit['status'] === 'approved') { ?>
                                         <small>
                                             Permit: <strong><?php echo htmlspecialchars($permit['permit_number']); ?></strong><br>
                                             Valid: <?php echo date('d/m/Y', strtotime($permit['activation_date'])); ?> -
                                                    <?php echo date('d/m/Y', strtotime($permit['end_date'])); ?>
                                         </small>
-                                    <?php else: ?>
+                                    <?php } else { ?>
                                         <button type="button" class="btn btn-secondary"
                                                 style="padding: 3px 8px; font-size: 11px;"
                                                 onclick="alert('Rejection Reason:\n<?php echo htmlspecialchars($permit['rejection_reason'] ?? 'No reason provided'); ?>')">
                                             View Reason
                                         </button>
-                                    <?php endif; ?>
+                                    <?php } ?>
                                 </td>
                             </tr>
-                        <?php endforeach; ?>
+                        <?php } ?>
                     </tbody>
                 </table>
             </div>
-        <?php else: ?>
+        <?php } else { ?>
 
             <div class="alert alert-info">
                 <strong>No processed requests</strong><br>
                 No parking permits have been approved or rejected yet.
             </div>
-        <?php endif; ?>
+        <?php } ?>
     </div>
 
     <div class="text-center mt-3">

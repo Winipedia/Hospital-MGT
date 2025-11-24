@@ -118,9 +118,9 @@ require_once 'includes/navbar.php';
                            value="<?php echo htmlspecialchars($search_term); ?>"
                            style="flex: 1;">
                     <button type="submit" class="btn btn-primary">Search</button>
-                    <?php if (!empty($search_term)): ?>
+                    <?php if (!empty($search_term)) { ?>
                         <a href="patient_search.php" class="btn btn-secondary">Clear</a>
-                    <?php endif; ?>
+                    <?php } ?>
                 </div>
                 <small style="color: #666; font-size: 12px;">
                     Search by first name, last name, full name, or NHS number
@@ -132,14 +132,14 @@ require_once 'includes/navbar.php';
     <!-- Patient List -->
     <div class="card">
         <h2>
-            <?php if (!empty($search_term)): ?>
+            <?php if (!empty($search_term)) { ?>
                 Search Results (<?php echo $total_patients; ?> found)
-            <?php else: ?>
+            <?php } else { ?>
                 All Patients (<?php echo $total_patients; ?> total)
-            <?php endif; ?>
+            <?php } ?>
         </h2>
 
-        <?php if (count($patients) > 0): ?>
+        <?php if (count($patients) > 0) { ?>
             <table>
                 <thead>
                     <tr>
@@ -152,7 +152,7 @@ require_once 'includes/navbar.php';
                     </tr>
                 </thead>
                 <tbody>
-                    <?php foreach ($patients as $patient): ?>
+                    <?php foreach ($patients as $patient) { ?>
                         <tr>
                             <td><strong><?php echo htmlspecialchars($patient['NHSno']); ?></strong></td>
                             <td><?php echo htmlspecialchars($patient['firstname'] . ' ' . $patient['lastname']); ?></td>
@@ -166,44 +166,44 @@ require_once 'includes/navbar.php';
                                 </a>
                             </td>
                         </tr>
-                    <?php endforeach; ?>
+                    <?php } ?>
                 </tbody>
             </table>
 
             <!-- Pagination -->
-            <?php if ($total_pages > 1): ?>
+            <?php if ($total_pages > 1) { ?>
                 <div style="margin-top: 20px; text-align: center;">
                     <div style="display: inline-flex; gap: 5px; align-items: center;">
-                        <?php if ($page > 1): ?>
+                        <?php if ($page > 1) { ?>
                             <a href="?<?php echo http_build_query(array_merge($_GET, ['page' => $page - 1])); ?>"
                                class="btn btn-secondary" style="padding: 8px 12px;">
                                 ← Previous
                             </a>
-                        <?php endif; ?>
+                        <?php } ?>
 
                         <span style="padding: 0 15px; color: #666;">
                             Page <?php echo $page; ?> of <?php echo $total_pages; ?>
                         </span>
 
-                        <?php if ($page < $total_pages): ?>
+                        <?php if ($page < $total_pages) { ?>
                             <a href="?<?php echo http_build_query(array_merge($_GET, ['page' => $page + 1])); ?>"
                                class="btn btn-secondary" style="padding: 8px 12px;">
                                 Next →
                             </a>
-                        <?php endif; ?>
+                        <?php } ?>
                     </div>
                 </div>
-            <?php endif; ?>
-        <?php else: ?>
+            <?php } ?>
+        <?php } else { ?>
             <div class="alert alert-warning">
                 <strong>No patients found!</strong><br>
-                <?php if (!empty($search_term)): ?>
+                <?php if (!empty($search_term)) { ?>
                     No patients matching "<?php echo htmlspecialchars($search_term); ?>" were found in the system.
-                <?php else: ?>
+                <?php } else { ?>
                     No patients in the system.
-                <?php endif; ?>
+                <?php } ?>
             </div>
-        <?php endif; ?>
+        <?php } ?>
     </div>
 
 

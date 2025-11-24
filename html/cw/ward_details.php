@@ -52,6 +52,7 @@ $patients_stmt->bind_param('i', $ward_id);
 $patients_stmt->execute();
 $patients_result = $patients_stmt->get_result();
 $current_patients = [];
+
 while ($row = $patients_result->fetch_assoc()) {
     $current_patients[] = $row;
 }
@@ -69,6 +70,7 @@ $doctors_stmt->bind_param('i', $ward_id);
 $doctors_stmt->execute();
 $doctors_result = $doctors_stmt->get_result();
 $ward_doctors = [];
+
 while ($row = $doctors_result->fetch_assoc()) {
     $ward_doctors[] = $row;
 }
@@ -88,6 +90,7 @@ $history_stmt->bind_param('i', $ward_id);
 $history_stmt->execute();
 $history_result = $history_stmt->get_result();
 $admission_history = [];
+
 while ($row = $history_result->fetch_assoc()) {
     $admission_history[] = $row;
 }
@@ -174,7 +177,7 @@ require_once 'includes/navbar.php';
             <h2>👥 Current Patients (<?php echo count($current_patients); ?>)</h2>
         </div>
         <div class="card-body">
-            <?php if (count($current_patients) > 0): ?>
+            <?php if (count($current_patients) > 0) { ?>
                 <div style="overflow-x: auto;">
                     <table class="data-table">
                         <thead>
@@ -190,7 +193,7 @@ require_once 'includes/navbar.php';
                             </tr>
                         </thead>
                         <tbody>
-                            <?php foreach ($current_patients as $patient): ?>
+                            <?php foreach ($current_patients as $patient) { ?>
                                 <tr>
                                     <td><code><?php echo htmlspecialchars($patient['NHSno']); ?></code></td>
                                     <td><strong><?php echo htmlspecialchars($patient['firstname'] . ' ' . $patient['lastname']); ?></strong></td>
@@ -207,15 +210,15 @@ require_once 'includes/navbar.php';
                                         <a href="patient_info.php?nhs=<?php echo urlencode($patient['NHSno']); ?>" class="btn btn-primary btn-sm">View</a>
                                     </td>
                                 </tr>
-                            <?php endforeach; ?>
+                            <?php } ?>
                         </tbody>
                     </table>
                 </div>
-            <?php else: ?>
+            <?php } else { ?>
                 <div class="info-message">
                     <p>ℹ️ No patients currently admitted to this ward.</p>
                 </div>
-            <?php endif; ?>
+            <?php } ?>
         </div>
     </div>
 
@@ -225,7 +228,7 @@ require_once 'includes/navbar.php';
             <h2>👨‍⚕️ Assigned Doctors (<?php echo count($ward_doctors); ?>)</h2>
         </div>
         <div class="card-body">
-            <?php if (count($ward_doctors) > 0): ?>
+            <?php if (count($ward_doctors) > 0) { ?>
                 <div style="overflow-x: auto;">
                     <table class="data-table">
                         <thead>
@@ -237,28 +240,28 @@ require_once 'includes/navbar.php';
                             </tr>
                         </thead>
                         <tbody>
-                            <?php foreach ($ward_doctors as $doctor): ?>
+                            <?php foreach ($ward_doctors as $doctor) { ?>
                                 <tr>
                                     <td><code><?php echo htmlspecialchars($doctor['staffno']); ?></code></td>
                                     <td><strong><?php echo htmlspecialchars($doctor['firstname'] . ' ' . $doctor['lastname']); ?></strong></td>
                                     <td><?php echo htmlspecialchars($doctor['specialisation_name'] ?? 'N/A'); ?></td>
                                     <td>
-                                        <?php if ($doctor['consultantstatus']): ?>
+                                        <?php if ($doctor['consultantstatus']) { ?>
                                             <span class="badge badge-success">Consultant</span>
-                                        <?php else: ?>
+                                        <?php } else { ?>
                                             <span class="badge badge-info">Doctor</span>
-                                        <?php endif; ?>
+                                        <?php } ?>
                                     </td>
                                 </tr>
-                            <?php endforeach; ?>
+                            <?php } ?>
                         </tbody>
                     </table>
                 </div>
-            <?php else: ?>
+            <?php } else { ?>
                 <div class="info-message">
                     <p>ℹ️ No doctors currently assigned to this ward.</p>
                 </div>
-            <?php endif; ?>
+            <?php } ?>
         </div>
     </div>
 
@@ -268,7 +271,7 @@ require_once 'includes/navbar.php';
             <h2>📋 Recent Admission History (Last 20)</h2>
         </div>
         <div class="card-body">
-            <?php if (count($admission_history) > 0): ?>
+            <?php if (count($admission_history) > 0) { ?>
                 <div style="overflow-x: auto;">
                     <table class="data-table">
                         <thead>
@@ -283,33 +286,33 @@ require_once 'includes/navbar.php';
                             </tr>
                         </thead>
                         <tbody>
-                            <?php foreach ($admission_history as $admission): ?>
+                            <?php foreach ($admission_history as $admission) { ?>
                                 <tr>
                                     <td><code><?php echo htmlspecialchars($admission['NHSno']); ?></code></td>
                                     <td><strong><?php echo htmlspecialchars($admission['firstname'] . ' ' . $admission['lastname']); ?></strong></td>
                                     <td><?php echo date('d/m/Y', strtotime($admission['date'])); ?></td>
                                     <td><?php echo $admission['time'] ? date('H:i', strtotime($admission['time'])) : 'N/A'; ?></td>
                                     <td>
-                                        <?php if ($admission['status'] === 'admitted'): ?>
+                                        <?php if ($admission['status'] === 'admitted') { ?>
                                             <span class="badge badge-success">Admitted</span>
-                                        <?php else: ?>
+                                        <?php } else { ?>
                                             <span class="badge badge-secondary">Discharged</span>
-                                        <?php endif; ?>
+                                        <?php } ?>
                                     </td>
                                     <td><?php echo htmlspecialchars($admission['consultant_firstname'] . ' ' . $admission['consultant_lastname']); ?></td>
                                     <td>
                                         <a href="patient_info.php?nhs=<?php echo urlencode($admission['NHSno']); ?>" class="btn btn-primary btn-sm">View</a>
                                     </td>
                                 </tr>
-                            <?php endforeach; ?>
+                            <?php } ?>
                         </tbody>
                     </table>
                 </div>
-            <?php else: ?>
+            <?php } else { ?>
                 <div class="info-message">
                     <p>ℹ️ No admission history found for this ward.</p>
                 </div>
-            <?php endif; ?>
+            <?php } ?>
         </div>
     </div>
 

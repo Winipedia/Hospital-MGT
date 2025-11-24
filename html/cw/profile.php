@@ -128,13 +128,13 @@ require_once 'includes/navbar.php';
         <p>Manage your account information and settings</p>
     </div>
 
-    <?php if ($success): ?>
+    <?php if ($success) { ?>
         <div class="alert alert-success"><?php echo htmlspecialchars($success); ?></div>
-    <?php endif; ?>
+    <?php } ?>
 
-    <?php if ($error): ?>
+    <?php if ($error) { ?>
         <div class="alert alert-error"><?php echo htmlspecialchars($error); ?></div>
-    <?php endif; ?>
+    <?php } ?>
 
     <div class="grid grid-2">
         <!-- Profile Information -->
@@ -214,9 +214,9 @@ require_once 'includes/navbar.php';
                 <th>Account Type</th>
                 <td>
                     <?php echo $doctor['is_admin'] ? 'Administrator' : 'Doctor'; ?>
-                    <?php if ($doctor['is_admin']): ?>
+                    <?php if ($doctor['is_admin']) { ?>
                         <span class="badge badge-admin">ADMIN</span>
-                    <?php endif; ?>
+                    <?php } ?>
                 </td>
             </tr>
             <tr>

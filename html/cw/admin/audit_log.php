@@ -77,6 +77,7 @@ $count_sql = "SELECT COUNT(*) as total
               FROM audit_log a 
               $where_clause";
 $count_stmt = $conn->prepare($count_sql);
+
 if (!empty($types)) {
     $count_stmt->bind_param($types, ...$params);
 }
@@ -107,6 +108,7 @@ $audit_stmt->bind_param($types, ...$params);
 $audit_stmt->execute();
 $audit_result = $audit_stmt->get_result();
 $audit_logs = [];
+
 while ($row = $audit_result->fetch_assoc()) {
     $audit_logs[] = $row;
 }
@@ -116,6 +118,7 @@ $audit_stmt->close();
 $users_sql = 'SELECT DISTINCT staffno, firstname, lastname FROM doctor ORDER BY firstname, lastname';
 $users_result = $conn->query($users_sql);
 $users = [];
+
 while ($row = $users_result->fetch_assoc()) {
     $users[] = $row;
 }
@@ -124,6 +127,7 @@ while ($row = $users_result->fetch_assoc()) {
 $actions_sql = 'SELECT DISTINCT action FROM audit_log ORDER BY action';
 $actions_result = $conn->query($actions_sql);
 $actions = [];
+
 while ($row = $actions_result->fetch_assoc()) {
     $actions[] = $row['action'];
 }
@@ -132,6 +136,7 @@ while ($row = $actions_result->fetch_assoc()) {
 $tables_sql = 'SELECT DISTINCT table_name FROM audit_log WHERE table_name IS NOT NULL ORDER BY table_name';
 $tables_result = $conn->query($tables_sql);
 $tables = [];
+
 while ($row = $tables_result->fetch_assoc()) {
     $tables[] = $row['table_name'];
 }
@@ -197,12 +202,12 @@ require_once '../includes/navbar.php';
                         <label for="user">User</label>
                         <select id="user" name="user">
                             <option value="">-- All Users --</option>
-                            <?php foreach ($users as $user): ?>
+                            <?php foreach ($users as $user) { ?>
                                 <option value="<?php echo htmlspecialchars($user['staffno']); ?>"
                                     <?php echo ($filter_user === $user['staffno']) ? 'selected' : ''; ?>>
                                     <?php echo htmlspecialchars($user['firstname'] . ' ' . $user['lastname'] . ' (' . $user['staffno'] . ')'); ?>
                                 </option>
-                            <?php endforeach; ?>
+                            <?php } ?>
                         </select>
                     </div>
 
@@ -211,12 +216,12 @@ require_once '../includes/navbar.php';
                         <label for="action">Action</label>
                         <select id="action" name="action">
                             <option value="">-- All Actions --</option>
-                            <?php foreach ($actions as $action): ?>
+                            <?php foreach ($actions as $action) { ?>
                                 <option value="<?php echo htmlspecialchars($action); ?>"
                                     <?php echo ($filter_action === $action) ? 'selected' : ''; ?>>
                                     <?php echo htmlspecialchars($action); ?>
                                 </option>
-                            <?php endforeach; ?>
+                            <?php } ?>
                         </select>
                     </div>
 
@@ -225,12 +230,12 @@ require_once '../includes/navbar.php';
                         <label for="table">Table</label>
                         <select id="table" name="table">
                             <option value="">-- All Tables --</option>
-                            <?php foreach ($tables as $table): ?>
+                            <?php foreach ($tables as $table) { ?>
                                 <option value="<?php echo htmlspecialchars($table); ?>"
                                     <?php echo ($filter_table === $table) ? 'selected' : ''; ?>>
                                     <?php echo htmlspecialchars($table); ?>
                                 </option>
-                            <?php endforeach; ?>
+                            <?php } ?>
                         </select>
                     </div>
                 </div>
@@ -264,14 +269,14 @@ require_once '../includes/navbar.php';
     <div class="card mt-3">
         <div class="card-header">
             <h2>📊 Audit Logs (<?php echo number_format($total_records); ?> records)</h2>
-            <?php if (count($where_conditions) > 0): ?>
+            <?php if (count($where_conditions) > 0) { ?>
                 <p style="margin: 5px 0 0 0; font-size: 14px; color: #666;">
                     Filtered results - Showing <?php echo count($audit_logs); ?> of <?php echo number_format($total_records); ?> records
                 </p>
-            <?php endif; ?>
+            <?php } ?>
         </div>
         <div class="card-body">
-            <?php if (count($audit_logs) > 0): ?>
+            <?php if (count($audit_logs) > 0) { ?>
                 <div style="overflow-x: auto;">
                     <table class="data-table">
                         <thead>
@@ -287,7 +292,7 @@ require_once '../includes/navbar.php';
                             </tr>
                         </thead>
                         <tbody>
-                            <?php foreach ($audit_logs as $log): ?>
+                            <?php foreach ($audit_logs as $log) { ?>
                                 <tr>
                                     <td><?php echo $log['audit_id']; ?></td>
                                     <td><?php echo date('d/m/Y H:i:s', strtotime($log['timestamp'])); ?></td>
@@ -295,14 +300,14 @@ require_once '../includes/navbar.php';
                                         <strong><?php echo htmlspecialchars($log['firstname'] . ' ' . $log['lastname']); ?></strong>
                                         <br>
                                         <small style="color: #666;"><?php echo htmlspecialchars($log['user_id']); ?></small>
-                                        <?php if ($log['is_admin']): ?>
+                                        <?php if ($log['is_admin']) { ?>
                                             <span class="badge badge-admin" style="margin-left: 5px;">ADMIN</span>
-                                        <?php endif; ?>
+                                        <?php } ?>
                                     </td>
                                     <td>
                                         <?php
                                         $action_colors = [
-                                            'LOGIN' => 'badge-success',
+                                            'LOGIN'  => 'badge-success',
                                             'LOGOUT' => 'badge-secondary',
                                             'INSERT' => 'badge-primary',
                                             'UPDATE' => 'badge-warning',
@@ -318,54 +323,54 @@ require_once '../includes/navbar.php';
                                     <td><?php echo htmlspecialchars($log['table_name'] ?? 'N/A'); ?></td>
                                     <td><code><?php echo htmlspecialchars($log['record_id'] ?? 'N/A'); ?></code></td>
                                     <td style="max-width: 300px;">
-                                        <?php if ($log['old_value']): ?>
+                                        <?php if ($log['old_value']) { ?>
                                             <strong>Old:</strong> <?php echo htmlspecialchars(substr($log['old_value'], 0, 100)); ?>
-                                            <?php if (strlen($log['old_value']) > 100): ?>...<?php endif; ?>
+                                            <?php if (strlen($log['old_value']) > 100) { ?>...<?php } ?>
                                             <br>
-                                        <?php endif; ?>
-                                        <?php if ($log['new_value']): ?>
+                                        <?php } ?>
+                                        <?php if ($log['new_value']) { ?>
                                             <strong>New:</strong> <?php echo htmlspecialchars(substr($log['new_value'], 0, 100)); ?>
-                                            <?php if (strlen($log['new_value']) > 100): ?>...<?php endif; ?>
-                                        <?php endif; ?>
+                                            <?php if (strlen($log['new_value']) > 100) { ?>...<?php } ?>
+                                        <?php } ?>
                                     </td>
                                     <td><code><?php echo htmlspecialchars($log['ip_address'] ?? 'N/A'); ?></code></td>
                                 </tr>
-                            <?php endforeach; ?>
+                            <?php } ?>
                         </tbody>
                     </table>
                 </div>
 
                 <!-- Pagination -->
-                <?php if ($total_pages > 1): ?>
+                <?php if ($total_pages > 1) { ?>
                     <div class="pagination" style="margin-top: 20px; display: flex; justify-content: center; gap: 5px;">
-                        <?php if ($page > 1): ?>
+                        <?php if ($page > 1) { ?>
                             <a href="?page=1<?php echo !empty($filter_user) ? '&user=' . urlencode($filter_user) : ''; ?><?php echo !empty($filter_action) ? '&action=' . urlencode($filter_action) : ''; ?><?php echo !empty($filter_table) ? '&table=' . urlencode($filter_table) : ''; ?><?php echo !empty($filter_date_from) ? '&date_from=' . urlencode($filter_date_from) : ''; ?><?php echo !empty($filter_date_to) ? '&date_to=' . urlencode($filter_date_to) : ''; ?>"
                                class="btn btn-secondary">« First</a>
                             <a href="?page=<?php echo $page - 1; ?><?php echo !empty($filter_user) ? '&user=' . urlencode($filter_user) : ''; ?><?php echo !empty($filter_action) ? '&action=' . urlencode($filter_action) : ''; ?><?php echo !empty($filter_table) ? '&table=' . urlencode($filter_table) : ''; ?><?php echo !empty($filter_date_from) ? '&date_from=' . urlencode($filter_date_from) : ''; ?><?php echo !empty($filter_date_to) ? '&date_to=' . urlencode($filter_date_to) : ''; ?>"
                                class="btn btn-secondary">‹ Previous</a>
-                        <?php endif; ?>
+                        <?php } ?>
 
                         <span class="btn btn-primary" style="cursor: default;">
                             Page <?php echo $page; ?> of <?php echo $total_pages; ?>
                         </span>
 
-                        <?php if ($page < $total_pages): ?>
+                        <?php if ($page < $total_pages) { ?>
                             <a href="?page=<?php echo $page + 1; ?><?php echo !empty($filter_user) ? '&user=' . urlencode($filter_user) : ''; ?><?php echo !empty($filter_action) ? '&action=' . urlencode($filter_action) : ''; ?><?php echo !empty($filter_table) ? '&table=' . urlencode($filter_table) : ''; ?><?php echo !empty($filter_date_from) ? '&date_from=' . urlencode($filter_date_from) : ''; ?><?php echo !empty($filter_date_to) ? '&date_to=' . urlencode($filter_date_to) : ''; ?>"
                                class="btn btn-secondary">Next ›</a>
                             <a href="?page=<?php echo $total_pages; ?><?php echo !empty($filter_user) ? '&user=' . urlencode($filter_user) : ''; ?><?php echo !empty($filter_action) ? '&action=' . urlencode($filter_action) : ''; ?><?php echo !empty($filter_table) ? '&table=' . urlencode($filter_table) : ''; ?><?php echo !empty($filter_date_from) ? '&date_from=' . urlencode($filter_date_from) : ''; ?><?php echo !empty($filter_date_to) ? '&date_to=' . urlencode($filter_date_to) : ''; ?>"
                                class="btn btn-secondary">Last »</a>
-                        <?php endif; ?>
+                        <?php } ?>
                     </div>
-                <?php endif; ?>
+                <?php } ?>
 
-            <?php else: ?>
+            <?php } else { ?>
                 <div class="info-message">
                     <p>ℹ️ No audit logs found matching the selected filters.</p>
-                    <?php if (count($where_conditions) > 0): ?>
+                    <?php if (count($where_conditions) > 0) { ?>
                         <p><a href="audit_log.php">Clear filters to view all logs</a></p>
-                    <?php endif; ?>
+                    <?php } ?>
                 </div>
-            <?php endif; ?>
+            <?php } ?>
         </div>
     </div>
 
@@ -393,6 +398,7 @@ if (!empty($types) && count($where_conditions) > 0) {
     $summary_types = substr($types, 0, -2);
     // Remove last two params (pagination)
     $summary_params = array_slice($params, 0, -2);
+
     if (!empty($summary_types)) {
         $summary_stmt->bind_param($summary_types, ...$summary_params);
     }
@@ -401,6 +407,7 @@ if (!empty($types) && count($where_conditions) > 0) {
 $summary_stmt->execute();
 $summary_result = $summary_stmt->get_result();
 $action_summary = [];
+
 while ($row = $summary_result->fetch_assoc()) {
     $action_summary[] = $row;
 }
@@ -408,12 +415,12 @@ $summary_stmt->close();
 ?>
 
             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px;">
-                <?php foreach ($action_summary as $summary): ?>
+                <?php foreach ($action_summary as $summary) { ?>
                     <div class="stat-card">
                         <div class="stat-label"><?php echo htmlspecialchars($summary['action']); ?></div>
                         <div class="stat-value"><?php echo number_format($summary['count']); ?></div>
                     </div>
-                <?php endforeach; ?>
+                <?php } ?>
             </div>
         </div>
     </div>

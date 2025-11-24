@@ -145,8 +145,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['prescribe_test'])) {
         } else {
             $patient_data = $patient_result->fetch_assoc();
 
-
-
             // ok patient exists, lets prescribe the test
             $prescribe_sql = 'INSERT INTO patient_test (pid, testid, date, doctorid) VALUES (?, ?, ?, ?)';
             $prescribe_stmt = $conn->prepare($prescribe_sql);
@@ -209,13 +207,13 @@ require_once 'includes/navbar.php';
         <p>Create new tests and prescribe them to patients</p>
     </div>
 
-    <?php if ($success): ?>
+    <?php if ($success) { ?>
         <div class="alert alert-success"><?php echo htmlspecialchars($success); ?></div>
-    <?php endif; ?>
+    <?php } ?>
 
-    <?php if ($error): ?>
+    <?php if ($error) { ?>
         <div class="alert alert-error"><?php echo htmlspecialchars($error); ?></div>
-    <?php endif; ?>
+    <?php } ?>
 
     <div class="grid grid-2">
         <!-- Create New Test -->
@@ -239,9 +237,9 @@ require_once 'includes/navbar.php';
             <div style="margin-top: 20px; padding: 15px; background: #f8f9fa; border-radius: 5px;">
                 <h3 style="margin-bottom: 10px; font-size: 14px; font-weight: bold;">Existing Tests:</h3>
                 <ul style="margin-left: 20px; line-height: 1.8; font-size: 13px;">
-                    <?php foreach ($all_tests as $test): ?>
+                    <?php foreach ($all_tests as $test) { ?>
                         <li><?php echo htmlspecialchars($test['testname']); ?> (ID: <?php echo $test['testid']; ?>)</li>
-                    <?php endforeach; ?>
+                    <?php } ?>
                 </ul>
             </div>
         </div>
@@ -281,11 +279,11 @@ require_once 'includes/navbar.php';
                         <label for="gender_id">Gender</label>
                         <select id="gender_id" name="gender_id">
                             <option value="0">-- Select Gender --</option>
-                            <?php foreach ($all_genders as $gender): ?>
+                            <?php foreach ($all_genders as $gender) { ?>
                                 <option value="<?php echo $gender['gender_id']; ?>">
                                     <?php echo htmlspecialchars($gender['gender_name']); ?>
                                 </option>
-                            <?php endforeach; ?>
+                            <?php } ?>
                         </select>
                     </div>
                 </div>
@@ -355,11 +353,11 @@ require_once 'includes/navbar.php';
                     <label for="test_id">Select Test *</label>
                     <select id="test_id" name="test_id" required>
                         <option value="">-- Select Test --</option>
-                        <?php foreach ($all_tests as $test): ?>
+                        <?php foreach ($all_tests as $test) { ?>
                             <option value="<?php echo $test['testid']; ?>">
                                 <?php echo htmlspecialchars($test['testname']); ?>
                             </option>
-                        <?php endforeach; ?>
+                        <?php } ?>
                     </select>
                 </div>
             </div>

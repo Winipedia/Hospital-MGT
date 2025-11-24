@@ -3,7 +3,7 @@
 /**
  * Database Connection Configuration
  * QMC Hospital Management System
- * COMP4039 Coursework
+ * COMP4039 Coursework.
  */
 
 // database config - using docker mariadb container
@@ -17,7 +17,7 @@ $conn = new mysqli($db_host, $db_user, $db_pass, $db_name);
 
 // check if connection worked, die if it didnt
 if ($conn->connect_error) {
-    die('Database connection failed: ' . $conn->connect_error);
+    exit('Database connection failed: ' . $conn->connect_error);
 }
 
 // set charset so we dont get weird encoding issues

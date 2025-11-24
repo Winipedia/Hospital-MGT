@@ -17,16 +17,16 @@ $path_prefix = isset($css_path_prefix) ? $css_path_prefix : '';
             <!-- show doctor name from session -->
             <div class="user-name">
                 Dr. <?php echo htmlspecialchars($_SESSION['firstname'] . ' ' . $_SESSION['lastname']); ?>
-                <?php if ($_SESSION['is_admin']): ?>
+                <?php if ($_SESSION['is_admin']) { ?>
                     <span class="badge badge-admin">ADMIN</span>
-                <?php endif; ?>
+                <?php } ?>
             </div>
             <!-- display specialisation and ward if available -->
             <div class="user-role">
                 <?php echo htmlspecialchars($_SESSION['specialisation'] ?? 'N/A'); ?>
-                <?php if (isset($_SESSION['ward'])): ?>
+                <?php if (isset($_SESSION['ward'])) { ?>
                     | <?php echo htmlspecialchars($_SESSION['ward']); ?>
-                <?php endif; ?>
+                <?php } ?>
             </div>
         </div>
         <a href="<?php echo $path_prefix; ?>logout.php" class="btn-logout">Logout</a>

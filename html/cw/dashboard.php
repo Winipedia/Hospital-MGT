@@ -79,7 +79,7 @@ require_once 'includes/navbar.php';
                 <div class="menu-card-desc">View all wards, bed occupancy, and patient admissions</div>
             </a>
 
-            <?php if ($is_admin): ?>
+            <?php if ($is_admin) { ?>
                 <a href="admin/create_doctor.php" class="menu-card" style="border-left-color: #ffd700;">
                     <div class="menu-card-icon">👨‍⚕️</div>
                     <div class="menu-card-title">Create Doctor Account</div>
@@ -97,7 +97,7 @@ require_once 'includes/navbar.php';
                     <div class="menu-card-title">Audit Trail</div>
                     <div class="menu-card-desc">View all database changes and user actions (Admin only)</div>
                 </a>
-            <?php endif; ?>
+            <?php } ?>
         </div>
     </div>
 </div>
