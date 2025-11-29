@@ -1,77 +1,45 @@
-# COMP4039-DIS Docker
+# QMC Hospital Management System
 
-## author: Stuart Reeves
+COMP4039 Coursework - Dockerized LAMP stack hospital management application.
 
-Docker files for COMP4039-DIS (Databases, Interfaces and Software Design Principles) L4 module.
+## Quick Start
 
-Contains the principal components of the standard LAMP (Linux, Apache, MySQL, PHP) stack:
-- apache2 (web server)
-- mariadb v10 (OSS MySQL server)
-- php v8
+Install Docker Desktop, then run:
+```
+docker compose up
+```
 
-The Docker compose file describing this (docker-compose.yml) also builds phpmyadmin, which provides a web-based GUI for the SQL database.
+Access points:
+- Application: http://localhost/cw/index.php
+- phpMyAdmin: http://localhost:8081
 
-In order to start the container you will need to download Docker. This could either be the desktop app (https://www.docker.com/products/docker-desktop/) or, depending on your OS, some other method e.g., via homebrew for macOS or via a packaging system if you run Linux.
+Default login: username `jelina`, password `iron99` (admin account)
 
-Once Docker is installed, run
+## Project Structure
 
-	docker compose up
+- html/cw/ - Hospital management application (PHP, CSS, JS)
+- mariadb/ - Database schema and initialization SQL
+- mariadb-data/ - Database storage (delete contents to rebuild from scratch)
+- php-apache/ - Apache/PHP Docker configuration
 
-at your command line. The relevant images will be pulled down (php-apache, mariadb, phpmyadmin), then the containers will be started. This should all be visible in the Docker desktop app.
+## Features
 
-You can now point a browser at the following locations:
+Doctor Portal:
+- Patient search and management
+- Test prescription and tracking
+- Ward admission management
+- Parking permit requests
+- Profile management
 
-	http://localhost/index.php - index to the example code included
-	http://localhost:8081 - phpmyadmin interface
+Admin Portal:
+- Doctor account creation
+- Parking permit approvals
+- Audit log viewing
 
+## Database
 
-## Contents description
+MariaDB 10 with hospital schema including patients, doctors, wards, tests, admissions, and parking permits. Root password: `rootpwd`
 
-html/ - all your HTML, PHP, CSS, JS etc. files go here (note that this dir includes example code from the module which you can use without citation in your coursework)
+## Tech Stack
 
-html/cw2/ - this is where you should put your Coursework 2 files
-
-mariadb/ - SQL files that are used to build the database when Docker starts; this includes the initial database for Coursework 2 which you will probably want to modify, as well as the database for the example code (phpdemos); also contains instructions to build the mariadb image
-
-mariadb-data/ - this is where the mariadb Docker container's database stores its files; if you want to rebuild your databases from scratch, see below for instructions
-
-php-apache/ - contains the instructions to build the php-apache image
-
-
-## Deleting the database and rebuilding
-
-If for whatever reason you want to delete your database and rebuild from the SQL source included in mariadb/ then simply delete the contents of mariadb-data and run 
-	
-	docker compose up
-
-again.
-
-
-## Where is my Docker running from?
-
-If you have trouble getting pages to load in your browser it may be that you have more than one Docker folder. You can check what part of your filesystem your containers are mapped to with the following command:
-
-    docker inspect -f "{{ .Mounts }}"  <your-container-id-or-name>
-
-You can find your container id (e.g., the apache one) in Docker Desktop - it's a string of numbers and letters.
-
-You can also locate the equivalent information in the Docker Desktop interface if you click on your main container - the info should be displayed near the top of the window.
-
-
-## Specific OS-related notes
-
-### Windows 
-
-If you are installing Docker for Windows, you may need to install the Windows Subsystem for Linux (WSL). You will either be told to do so or you might encounter an error related to "WSL kernel version too low" or similar. In either case you will need to run cmd.exe and the following commands:
-
-	wsl --install
-	wsl --update
-
-If you receive an "Unexpected WSL error" from Docker Desktop you may be able to resolve it by checking that virtualisation is enabled in your system BIOS. This can usually be accessed at startup via a specific key (e.g., F2) - depending on your machine.
-
-
-### macOS
-
-If you are installing Docker for macOS, some have encountered errors where Docker Desktop won't start. In which case try some of the following:
-
-	https://mattsimpson.ca/2022/12/27/docker-desktop-for-mac-wont-start
+Apache 2, PHP 8, MariaDB 10, phpMyAdmin
